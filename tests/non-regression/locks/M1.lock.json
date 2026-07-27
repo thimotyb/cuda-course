@@ -1,0 +1,25 @@
+{
+  "id": "M1",
+  "file": "site/chapters/chapter-01.html",
+  "required_texts": [
+    "M1 - Introduction to Heterogeneous Parallel Computing",
+    "Learning outcomes",
+    "Scope",
+    "1. Syllabus Topics",
+    "2. Guided Exercises",
+    "1.1 Difference between serial, parallel, and heterogeneous computing",
+    "1.2 Role of the CPU and the GPU in a modern application",
+    "1.3 Why more speed and more parallelism are needed",
+    "1.4 Examples of real applications accelerated with GPUs",
+    "1.5 Benefits and limits of the parallel approach",
+    "1.6 Main difficulties in parallel programming",
+    "2.1 Concept check",
+    "2.2 Reading path",
+    "Module aligned 1:1 with the syllabus section on heterogeneous parallel computing and the motivation for GPU acceleration."
+  ],
+  "required_images": [],
+  "required_links": [
+    "../index.html",
+    "chapter-02.html"
+  ]
+}

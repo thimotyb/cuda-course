@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPUs and CUDA for Parallel Computing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="shell">
+      <div class="header-top">
+        <p class="site-mark">CUDA Course</p>
+        <div class="header-controls">
+          <label class="lang-switch" for="lang-select">
+            <span>Language</span>
+            <select id="lang-select" aria-label="Choose language">
+              <option value="en" selected>English</option>
+              <option value="it">Italiano</option>
+            </select>
+          </label>
+          <label class="theme-switch" for="theme-select">
+            <span>Theme</span>
+            <select id="theme-select" aria-label="Choose theme">
+              <option value="light" selected>Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <section class="hero">
+        <h1>GPUs and CUDA for Parallel Computing</h1>
+        <p class="hero-copy">
+          A practical course site for understanding heterogeneous computing, writing first CUDA kernels,
+          reasoning about GPU architecture, and tuning memory-bound workloads for real performance gains.
+        </p>
+        <div class="pill-row">
+          <span class="pill">8 modules</span>
+          <span class="pill">Static Netlify site</span>
+          <span class="pill">English source, Italian switch</span>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main class="shell" id="main-content">
+    <section class="section-head" id="modules">
+      <h2>Modules</h2>
+      <p class="section-sub">The syllabus follows the local course outline and turns the PDF plus curated resources into a teachable sequence.</p>
+    </section>
+
+    <ul class="agenda-list">
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-01.html"><span class="agenda-number">M1</span><span class="agenda-copy"><span class="agenda-text">Introduction to Heterogeneous Parallel Computing</span><span class="agenda-teaser">Why GPUs exist, what they accelerate, and where parallel thinking starts to matter.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-02.html"><span class="agenda-number">M2</span><span class="agenda-copy"><span class="agenda-text">CUDA Programming Model</span><span class="agenda-teaser">Host code, kernels, grids, blocks, memory allocation, and a first vector-add kernel.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-03.html"><span class="agenda-number">M3</span><span class="agenda-copy"><span class="agenda-text">GPU Compute Architecture</span><span class="agenda-teaser">SMs, warps, scheduling, divergence, latency hiding, and occupancy.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-04.html"><span class="agenda-number">M4</span><span class="agenda-copy"><span class="agenda-text">Memory Architecture and Data Locality</span><span class="agenda-teaser">Memory spaces, bandwidth limits, tiling, matrix multiplication, and boundary handling.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-05.html"><span class="agenda-number">M5</span><span class="agenda-copy"><span class="agenda-text">Performance Measurement</span><span class="agenda-teaser">CPU timers, CUDA events, bottleneck analysis, and reliable measurement workflow.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-06.html"><span class="agenda-number">M6</span><span class="agenda-copy"><span class="agenda-text">Memory Optimization</span><span class="agenda-teaser">Pinned memory, asynchronous copies, streams, and reducing global-memory pressure.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-07.html"><span class="agenda-number">M7</span><span class="agenda-copy"><span class="agenda-text">CUDA Configuration Optimization</span><span class="agenda-teaser">Thread-block sizing, resource trade-offs, and systematic kernel tuning.</span></span></a></li>
+      <li class="agenda-item"><a class="agenda-link" href="chapters/chapter-08.html"><span class="agenda-number">M8</span><span class="agenda-copy"><span class="agenda-text">CUDA and PyTorch</span><span class="agenda-teaser">Using `torch.cuda` to move tensors and models onto GPU and reason about runtime behavior.</span></span></a></li>
+    </ul>
+
+    <section class="panel info-grid">
+      <article>
+        <h2>Learning outputs</h2>
+        <ul class="meta-list">
+          <li>Understand the CPU/GPU split in heterogeneous systems.</li>
+          <li>Write and launch simple CUDA kernels.</li>
+          <li>Reason about warps, divergence, occupancy, and memory bandwidth.</li>
+          <li>Measure runtime correctly and identify where time is actually spent.</li>
+          <li>Apply first-line optimization techniques in CUDA and PyTorch workflows.</li>
+        </ul>
+      </article>
+      <article>
+        <h2>Primary raw materials</h2>
+        <ul class="meta-list">
+          <li>`resources/ProgrammingMassivelyParallel-5th-ed-9780443439018.pdf`</li>
+          <li>`resources/1.1. Introduction — CUDA Programming Guide.url`</li>
+          <li>`resources/CUDA Toolkit - Free Tools and Training - NVIDIA Developer.url`</li>
+          <li>`resources/How to Think About GPUs - How To Scale Your Model.url`</li>
+          <li>`resources/thimotyb-accelerated-computing-hub- NVIDIA curated collection of educational resources related to general purpose GPU program.url`</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel reference-grid">
+      <article>
+        <h3>Course direction</h3>
+        <p>The sequence begins with the fundamentals from heterogeneous data-parallel computing, then moves into execution, architecture, memory, measurement, and optimization. The final module shifts the same ideas into PyTorch so the GPU model remains actionable in everyday ML code.</p>
+        <div class="callout">
+          The site is authored in English to preserve technical precision. Italian is available through the on-page language selector.
+        </div>
+      </article>
+      <article>
+        <h3>Exercise sources</h3>
+        <p>External resources are integrated mainly as lab prompts, further reading, and extension paths rather than as duplicated course notes.</p>
+        <ul class="meta-list">
+          <li>NVIDIA documentation for concepts and APIs.</li>
+          <li>CUDA Toolkit portal for tooling, Nsight, libraries, and training.</li>
+          <li>Accelerated Computing Hub for additional tutorials and runnable tracks.</li>
+          <li>PyTorch docs for `torch.cuda` usage patterns.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel" id="references">
+      <h3>References</h3>
+      <ul class="meta-list">
+        <li><a href="https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/introduction.html" target="_blank" rel="noopener noreferrer">CUDA Programming Guide</a></li>
+        <li><a href="https://developer.nvidia.com/cuda/toolkit" target="_blank" rel="noopener noreferrer">NVIDIA CUDA Toolkit</a></li>
+        <li><a href="https://jax-ml.github.io/scaling-book/gpus/" target="_blank" rel="noopener noreferrer">How to Think About GPUs</a></li>
+        <li><a href="https://github.com/thimotyb/accelerated-computing-hub" target="_blank" rel="noopener noreferrer">Accelerated Computing Hub</a></li>
+        <li><a href="https://docs.pytorch.org/docs/stable/cuda.html" target="_blank" rel="noopener noreferrer">PyTorch CUDA Documentation</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="shell footer-note">
+    Static course workspace prepared for Netlify publishing.
+  </footer>
+
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

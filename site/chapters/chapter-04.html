@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M4 - Memory Architecture and Data Locality</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a></p>
+        <h1>M4 - Memory Architecture and Data Locality</h1>
+        <p class="hero-copy">Module aligned 1:1 with the syllabus section on bandwidth, memory hierarchy, data locality, tiling, and matrix multiplication.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Module outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Module navigation"><a href="chapter-03.html">M3 Previous</a><span>M4</span><a href="chapter-05.html">M5 Next</a></nav></section>
+      <section class="panel info-grid">
+        <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Understand the CUDA memory hierarchy.</li><li>Recognize why bandwidth is often the main bottleneck.</li><li>Apply locality and tiling ideas to matrix kernels.</li></ul></div>
+        <div><h2>Scope</h2><p>This module follows the exact topic list of the syllabus memory section.</p></div>
+      </section>
+      <section class="panel">
+        <h2>1. Syllabus Topics</h2>
+        <article class="subtopic"><h3>1.1 Memory bandwidth as a performance limit</h3><p>Many GPU kernels become memory-bound before they become compute-bound. If each useful arithmetic operation depends on expensive global-memory traffic, performance is capped by how quickly data can be moved rather than by how many arithmetic units are available.</p></article>
+        <article class="subtopic"><h3>1.2 CUDA memory hierarchy</h3><p>CUDA provides a hierarchy that includes registers, shared memory, local memory, global memory, and specialized read paths. The hierarchy exists because different access patterns need different trade-offs between capacity, latency, and sharing.</p></article>
+        <article class="subtopic"><h3>1.3 Global, shared, local, constant, and texture memory</h3><p>Global memory is large and visible across the device, shared memory is on-chip and scoped to one block, local memory usually backs per-thread spill or private storage beyond registers, and constant or texture spaces support particular read patterns efficiently.</p></article>
+        <article class="subtopic"><h3>1.4 Difference between host memory and device memory</h3><p>Host memory belongs to the CPU side of the system, while device memory is the GPU-resident global space used by kernels. In the standard model, data must be copied explicitly between them.</p></article>
+        <article class="subtopic"><h3>1.5 Efficient data access</h3><p>Efficient access requires arranging data and thread mappings so memory transactions are regular and useful. Poor access patterns waste bandwidth and can destroy the expected benefit of parallel execution.</p></article>
+        <article class="subtopic"><h3>1.6 Data locality and reduction of memory traffic</h3><p>Data locality means using data close together in time and space so already-fetched values can be reused. The core optimization goal is to perform more useful work for each byte moved from expensive memory levels.</p></article>
+        <article class="subtopic"><h3>1.7 The tiling technique</h3><p>Tiling organizes computation around subregions of the input so threads in a block can stage reusable data in shared memory. It is one of the first major CUDA optimization patterns because it directly reduces redundant global-memory traffic.</p></article>
+        <article class="subtopic"><h3>1.8 Practical example: matrix multiplication with tiling</h3><p>Tiled matrix multiplication loads submatrices into shared memory, synchronizes the block, performs partial accumulation, and iterates over tiles. It is a standard example because the value of reuse is easy to reason about and easy to measure.</p></article>
+        <article class="subtopic"><h3>1.9 Boundary checks in kernels</h3><p>Boundary checks are required whenever problem dimensions do not align perfectly with tile or block dimensions. They prevent out-of-range reads and writes and are part of production-ready kernel design.</p></article>
+        <article class="subtopic"><h3>1.10 Impact of memory usage on occupancy</h3><p>Using more shared memory or causing more register pressure can reduce the number of resident blocks or warps per SM. Memory optimization therefore changes not only traffic but also occupancy and scheduling flexibility.</p></article>
+      </section>
+      <section class="panel">
+        <h2>2. Guided Exercises</h2>
+        <article class="subtopic"><h3>2.1 Locality exercise</h3><ul class="exercise-list"><li>Take a naive kernel and identify which global-memory accesses are reused.</li><li>State which data could benefit from shared-memory staging.</li></ul></article>
+        <article class="subtopic"><h3>2.2 Tiling exercise</h3><ul class="exercise-list"><li>Implement tiled matrix multiplication.</li><li>Add boundary checks for dimensions not divisible by the tile size.</li><li>Compare the tiled kernel to a naive one and explain the difference in terms of memory traffic.</li></ul></article>
+        <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
+      </section>
+    </article>
+  </main>
+  <footer class="shell footer-note">Module M4 of the CUDA course site.</footer>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

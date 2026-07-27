@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M1 - Introduction to Heterogeneous Parallel Computing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a></p>
+        <h1>M1 - Introduction to Heterogeneous Parallel Computing</h1>
+        <p class="hero-copy">Module aligned 1:1 with the syllabus section on heterogeneous parallel computing and the motivation for GPU acceleration.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Module outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Module navigation"><span>M1</span><a href="chapter-02.html">M2 Next</a></nav></section>
+      <section class="panel info-grid">
+        <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Understand the distinction between serial, parallel, and heterogeneous execution.</li><li>Explain why CPU and GPU coexist in modern systems.</li><li>Recognize the main benefits and risks of parallel programming.</li></ul></div>
+        <div><h2>Scope</h2><p>This module mirrors exactly the first syllabus block and keeps the same sequence of conceptual topics before any CUDA code is introduced.</p></div>
+      </section>
+      <section class="panel">
+        <h2>1. Syllabus Topics</h2>
+        <article class="subtopic"><h3>1.1 Difference between serial, parallel, and heterogeneous computing</h3><p>Serial computing advances one control flow over one working element at a time. Parallel computing exposes many independent operations so multiple execution resources can work simultaneously. Heterogeneous computing combines different processor classes, typically CPU and GPU, so each one executes the portion of the application that matches its strengths.</p></article>
+        <article class="subtopic"><h3>1.2 Role of the CPU and the GPU in a modern application</h3><p>The CPU usually manages control flow, operating-system interaction, orchestration, and irregular logic. The GPU is used for throughput-oriented regions with large amounts of regular work across data collections such as vectors, matrices, grids, images, or batches.</p></article>
+        <article class="subtopic"><h3>1.3 Why more speed and more parallelism are needed</h3><p>Workloads in scientific computing, data analytics, simulation, and AI often exceed what single-thread latency improvements can deliver. The practical route to more performance is to exploit more parallel work and more memory bandwidth instead of expecting one core to become infinitely faster.</p></article>
+        <article class="subtopic"><h3>1.4 Examples of real applications accelerated with GPUs</h3><p>GPU acceleration is common in linear algebra, image processing, physical simulation, rendering, molecular modeling, recommendation systems, and deep learning. These applications benefit because the same or similar operations are repeated across many data elements, which maps naturally to the GPU execution model.</p></article>
+        <article class="subtopic"><h3>1.5 Benefits and limits of the parallel approach</h3><p>The main benefits are higher throughput, better scalability on data-parallel workloads, and access to very high memory bandwidth. The main limits are the sequential fraction of an application, data transfer overhead, irregular control flow, synchronization costs, and the engineering complexity required to use the hardware well.</p></article>
+        <article class="subtopic"><h3>1.6 Main difficulties in parallel programming</h3><p>Parallel software is harder to design, debug, and measure than serial software. The programmer must reason about data partitioning, mapping of work to threads, memory movement, synchronization boundaries, and performance bottlenecks that can appear even when the code is logically correct.</p></article>
+      </section>
+      <section class="panel">
+        <h2>2. Guided Exercises</h2>
+        <article class="subtopic"><h3>2.1 Concept check</h3><ul class="exercise-list"><li>Write one short example of a task that should remain CPU-centric and one that should move to the GPU.</li><li>Explain in your own words why more cores do not automatically solve memory-bandwidth limitations.</li><li>List three risks that make parallel software harder than serial software.</li></ul></article>
+        <article class="subtopic"><h3>2.2 Reading path</h3><ul class="exercise-list"><li>Read the introduction of the CUDA Programming Guide and extract its explanation of why GPUs evolved into general-purpose accelerators.</li><li>Use the “How to Think About GPUs” reference to compare throughput-oriented design with latency-oriented design.</li></ul></article>
+        <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
+      </section>
+    </article>
+  </main>
+  <footer class="shell footer-note">Module M1 of the CUDA course site.</footer>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

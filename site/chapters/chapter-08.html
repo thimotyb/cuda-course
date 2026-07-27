@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M8 - CUDA and PyTorch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a></p>
+        <h1>M8 - CUDA and PyTorch</h1>
+        <p class="hero-copy">Module aligned 1:1 with the syllabus section on GPU usage in PyTorch, `torch.cuda`, tensor movement, and basic memory handling.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Module outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Module navigation"><a href="chapter-07.html">M7 Previous</a><span>M8</span></nav></section>
+      <section class="panel info-grid">
+        <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Use `torch.cuda` to inspect device availability.</li><li>Move tensors and models to GPU correctly.</li><li>Understand the difference between CPU and GPU execution in PyTorch.</li></ul></div>
+        <div><h2>Scope</h2><p>This module follows exactly the PyTorch syllabus block and translates it into a practical framework-oriented view of CUDA usage.</p></div>
+      </section>
+      <section class="panel">
+        <h2>1. Syllabus Topics</h2>
+        <article class="subtopic"><h3>1.1 Introduction to GPU support in PyTorch</h3><p>PyTorch exposes CUDA-capable devices through its tensor and module abstractions. The framework hides low-level kernel launches, but it still relies on the same device model and memory semantics introduced in the previous modules.</p></article>
+        <article class="subtopic"><h3>1.2 Using the `torch.cuda` package</h3><p>`torch.cuda` provides utilities for querying device availability, selecting devices, inspecting streams, and observing memory behavior. It is the operational entry point for CUDA awareness in PyTorch programs.</p></article>
+        <article class="subtopic"><h3>1.3 Verifying GPU availability</h3><p>The first practical step is to test whether CUDA is available and how many devices are visible. This prevents incorrect assumptions in notebooks, scripts, and course exercises.</p></article>
+        <article class="subtopic"><h3>1.4 Moving tensors and models to the GPU</h3><p>Tensors and modules must be placed explicitly on the chosen device. Correct execution requires that both data and model parameters reside in the same device context.</p></article>
+        <article class="subtopic"><h3>1.5 Difference between CPU computation and GPU computation</h3><p>CPU execution is usually simpler to inspect and often better for small or irregular workloads. GPU execution is beneficial when the operation has enough parallel work to justify device launch and memory placement overhead.</p></article>
+        <article class="subtopic"><h3>1.6 Basic management of GPU memory in PyTorch</h3><p>PyTorch provides helpers to inspect allocated or reserved GPU memory and to reason about when tensors remain alive. This makes memory behavior easier to observe than in raw CUDA, but the programmer still needs discipline about tensor lifetime and batch size.</p></article>
+        <article class="subtopic"><h3>1.7 Practical examples of CUDA usage with PyTorch tensors</h3><p>Typical examples include moving tensors with `.to(device)`, running matrix multiplication on the GPU, moving a model to CUDA, synchronizing before timing, and comparing CPU and GPU runtime for the same tensor workload.</p></article>
+      </section>
+      <section class="panel">
+        <h2>2. Guided Exercises</h2>
+        <article class="subtopic"><h3>2.1 Device exercise</h3><ul class="exercise-list"><li>Print CUDA availability, device count, current device, and device name.</li><li>Create one tensor on CPU and one on GPU and verify their devices.</li></ul></article>
+        <article class="subtopic"><h3>2.2 PyTorch benchmark exercise</h3><ul class="exercise-list"><li>Run the same matrix multiplication on CPU and GPU.</li><li>Synchronize before reading the GPU timer.</li><li>Explain at which problem size the GPU starts to make sense.</li></ul></article>
+        <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
+      </section>
+    </article>
+  </main>
+  <footer class="shell footer-note">Module M8 of the CUDA course site.</footer>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

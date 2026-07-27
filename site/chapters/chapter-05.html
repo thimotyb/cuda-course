@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M5 - Performance Measurement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a></p>
+        <h1>M5 - Performance Measurement</h1>
+        <p class="hero-copy">Module aligned 1:1 with the syllabus section on performance metrics, timing methods, transfer analysis, and bottleneck discovery.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Module outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Module navigation"><a href="chapter-04.html">M4 Previous</a><span>M5</span><a href="chapter-06.html">M6 Next</a></nav></section>
+      <section class="panel info-grid">
+        <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Measure host and device time correctly.</li><li>Separate kernel execution from transfer overhead.</li><li>Identify bottlenecks before optimizing.</li></ul></div>
+        <div><h2>Scope</h2><p>This module tracks the performance-measurement syllabus section exactly and keeps the same order of topics.</p></div>
+      </section>
+      <section class="panel">
+        <h2>1. Syllabus Topics</h2>
+        <article class="subtopic"><h3>1.1 Main metrics for performance evaluation</h3><p>Common metrics include elapsed time, throughput, effective bandwidth, speedup, and resource utilization. The right metric depends on whether the objective is total application time, kernel efficiency, or the balance between compute and memory activity.</p></article>
+        <article class="subtopic"><h3>1.2 Measuring time on the CPU side</h3><p>Host timers are used for end-to-end timing and can capture preparation, submission, synchronization, and result handling. They are useful when the question is about the total user-visible cost of a computation.</p></article>
+        <article class="subtopic"><h3>1.3 Using CUDA timers on the GPU side</h3><p>CUDA events measure time on the device timeline and are the standard way to time kernels or other GPU-side intervals accurately. They avoid confusing CPU submission time with actual device execution time.</p></article>
+        <article class="subtopic"><h3>1.4 Difference between total execution time and actual kernel time</h3><p>Total execution time may include allocation, host-device copies, launch overhead, synchronization, and output verification. Kernel time isolates only the interval during which the GPU executes the kernel body itself.</p></article>
+        <article class="subtopic"><h3>1.5 Analysis of host-device transfers</h3><p>Transfer analysis separates host-to-device and device-to-host cost from kernel cost. This matters because many early CUDA programs are limited more by data movement than by the kernel itself.</p></article>
+        <article class="subtopic"><h3>1.6 Identification of bottlenecks</h3><p>Bottleneck analysis asks which resource is actually limiting progress: compute throughput, memory bandwidth, transfer overhead, synchronization, or application structure. Optimization is only justified after that limiting resource is identified clearly.</p></article>
+      </section>
+      <section class="panel">
+        <h2>2. Guided Exercises</h2>
+        <article class="subtopic"><h3>2.1 Timing exercise</h3><ul class="exercise-list"><li>Measure one workload with a CPU timer and again with CUDA events.</li><li>State what each measurement includes and excludes.</li></ul></article>
+        <article class="subtopic"><h3>2.2 Bottleneck exercise</h3><ul class="exercise-list"><li>Break one program into allocation time, transfer time, kernel time, and total time.</li><li>Choose the first optimization target and justify it using the measurements.</li></ul></article>
+        <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
+      </section>
+    </article>
+  </main>
+  <footer class="shell footer-note">Module M5 of the CUDA course site.</footer>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

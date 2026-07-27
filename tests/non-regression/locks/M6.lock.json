@@ -1,0 +1,28 @@
+{
+  "id": "M6",
+  "file": "site/chapters/chapter-06.html",
+  "required_texts": [
+    "M6 - Memory Optimization",
+    "Learning outcomes",
+    "Scope",
+    "1. Syllabus Topics",
+    "2. Guided Exercises",
+    "1.1 Optimization of host-device transfers",
+    "1.2 Use of pinned memory",
+    "1.3 Asynchronous transfers",
+    "1.4 Overlap between computation and data transfer",
+    "1.5 Correct use of CUDA streams",
+    "1.6 Choosing the most suitable memory spaces",
+    "1.7 Reducing accesses to global memory",
+    "1.8 Using shared memory to improve performance",
+    "2.1 Transfer experiment",
+    "2.2 Overlap experiment",
+    "Module aligned 1:1 with the syllabus section on pinned memory, asynchronous transfers, overlap, streams, and reducing global-memory pressure."
+  ],
+  "required_images": [],
+  "required_links": [
+    "../index.html",
+    "chapter-05.html",
+    "chapter-07.html"
+  ]
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M7 - CUDA Configuration Optimization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a></p>
+        <h1>M7 - CUDA Configuration Optimization</h1>
+        <p class="hero-copy">Module aligned 1:1 with the syllabus section on block sizing, warp and occupancy relations, resource balance, and configuration sweeps.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Module outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Module navigation"><a href="chapter-06.html">M6 Previous</a><span>M7</span><a href="chapter-08.html">M8 Next</a></nav></section>
+      <section class="panel info-grid">
+        <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Tune thread-block size pragmatically.</li><li>Relate occupancy to registers and shared memory.</li><li>Test configuration hypotheses systematically.</li></ul></div>
+        <div><h2>Scope</h2><p>This module reproduces the exact topic order of the configuration-optimization syllabus block.</p></div>
+      </section>
+      <section class="panel">
+        <h2>1. Syllabus Topics</h2>
+        <article class="subtopic"><h3>1.1 Choosing block dimensions</h3><p>Block size affects warp packing, resource consumption, synchronization structure, and total grid shape. A good initial choice is usually a multiple of the warp size, but final tuning must be measured on the target kernel and device.</p></article>
+        <article class="subtopic"><h3>1.2 Relationship among threads, blocks, warps, and occupancy</h3><p>Threads are grouped into warps and warps are grouped inside blocks. The number of blocks that can reside on an SM contributes to occupancy, which acts as a proxy for how much scheduling flexibility exists to hide latency.</p></article>
+        <article class="subtopic"><h3>1.3 Balancing registers, shared memory, and active threads</h3><p>Registers per thread and shared memory per block constrain how many blocks and warps can be active simultaneously. Tuning therefore requires balancing useful local resources against the desire to keep enough work resident.</p></article>
+        <article class="subtopic"><h3>1.4 Effects of kernel configuration on performance</h3><p>Kernel configuration changes runtime because it changes occupancy, memory-access shape, synchronization behavior, and how well the hardware can fill warps. Different kernels react differently, so performance tuning cannot rely on a single universal launch size.</p></article>
+        <article class="subtopic"><h3>1.5 Practical strategies for testing different configurations</h3><p>The correct strategy is to sweep valid configurations, preserve correctness checks, and record results with clear device context. Tuning becomes reliable when it is evidence-driven rather than based on folklore.</p></article>
+      </section>
+      <section class="panel">
+        <h2>2. Guided Exercises</h2>
+        <article class="subtopic"><h3>2.1 Launch sweep</h3><ul class="exercise-list"><li>Benchmark one kernel with several block sizes.</li><li>Record runtime and note any changes in occupancy estimates.</li><li>Explain the winning choice in terms of resources, not only in terms of the number itself.</li></ul></article>
+        <article class="subtopic"><h3>2.2 Comparative tuning</h3><ul class="exercise-list"><li>Compare the best launch configuration for a simple vector kernel and for a tiled kernel.</li><li>Explain why the same configuration does not need to be optimal for both.</li></ul></article>
+        <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
+      </section>
+    </article>
+  </main>
+  <footer class="shell footer-note">Module M7 of the CUDA course site.</footer>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

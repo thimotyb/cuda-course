@@ -1,0 +1,25 @@
+{
+  "id": "M7",
+  "file": "site/chapters/chapter-07.html",
+  "required_texts": [
+    "M7 - CUDA Configuration Optimization",
+    "Learning outcomes",
+    "Scope",
+    "1. Syllabus Topics",
+    "2. Guided Exercises",
+    "1.1 Choosing block dimensions",
+    "1.2 Relationship among threads, blocks, warps, and occupancy",
+    "1.3 Balancing registers, shared memory, and active threads",
+    "1.4 Effects of kernel configuration on performance",
+    "1.5 Practical strategies for testing different configurations",
+    "2.1 Launch sweep",
+    "2.2 Comparative tuning",
+    "Module aligned 1:1 with the syllabus section on block sizing, warp and occupancy relations, resource balance, and configuration sweeps."
+  ],
+  "required_images": [],
+  "required_links": [
+    "../index.html",
+    "chapter-06.html",
+    "chapter-08.html"
+  ]
+}

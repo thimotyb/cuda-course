@@ -1,0 +1,29 @@
+{
+  "id": "M3",
+  "file": "site/chapters/chapter-03.html",
+  "required_texts": [
+    "M3 - GPU Compute Architecture",
+    "Learning outcomes",
+    "Scope",
+    "1. Syllabus Topics",
+    "2. Guided Exercises",
+    "1.1 General structure of a modern GPU",
+    "1.2 Streaming Multiprocessor, CUDA cores, and resource organization",
+    "1.3 Scheduling of thread blocks",
+    "1.4 Synchronization among threads of the same block",
+    "1.5 Transparent scalability of CUDA kernels",
+    "1.6 Warps and the SIMD or SIMT model",
+    "1.7 Control-flow divergence",
+    "1.8 Warp scheduling and latency tolerance",
+    "1.9 Occupancy and resource partitioning",
+    "2.1 Architecture reasoning",
+    "2.2 Divergence exercise",
+    "Module aligned 1:1 with the syllabus section on SM organization, warps, scheduling, divergence, latency tolerance, and occupancy."
+  ],
+  "required_images": [],
+  "required_links": [
+    "../index.html",
+    "chapter-02.html",
+    "chapter-04.html"
+  ]
+}
