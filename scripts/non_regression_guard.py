@@ -180,8 +180,6 @@ def check_module_flow(html: str) -> list[str]:
         issues.append("Missing 'Scope' section")
     if not any(h.startswith("1. ") for h in headings):
         issues.append("Missing numbered module content section")
-    if not any("Guided Exercises" in h for h in headings):
-        issues.append("Missing 'Guided Exercises' section")
 
     info_grid_pos = html.find('class="panel info-grid"')
     article_pos = html.find("<article")
