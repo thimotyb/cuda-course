@@ -19,8 +19,7 @@
     "2.1 Concept check",
     "2.2 Reading path",
     "3.1 Glossary: TFLOPS",
-    "3.2 Sitography",
-    "Module aligned 1:1 with the syllabus section on heterogeneous parallel computing and the motivation for GPU acceleration."
+    "3.2 Sitography"
   ],
   "required_images": [
     "../assets/images/m1-gpu-devotes-more-transistors-to-data-processing.png"
