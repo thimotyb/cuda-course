@@ -422,6 +422,34 @@ body {
   margin-top: 0.8rem;
 }
 
+figure[data-zoomable],
+.module-figure {
+  margin: 1rem 0 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+figure[data-zoomable] img,
+.module-figure img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: zoom-in;
+}
+
+figure[data-zoomable] figcaption,
+.module-figure figcaption {
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
 .exercise-list li + li,
 .checklist li + li {
   margin-top: 0.45rem;

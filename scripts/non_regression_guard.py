@@ -178,8 +178,8 @@ def check_module_flow(html: str) -> list[str]:
         issues.append("Missing 'Learning outcomes' section")
     if not any("Scope" == h for h in headings):
         issues.append("Missing 'Scope' section")
-    if not any("Syllabus Topics" in h for h in headings):
-        issues.append("Missing 'Syllabus Topics' section")
+    if not any(h.startswith("1. ") for h in headings):
+        issues.append("Missing numbered module content section")
     if not any("Guided Exercises" in h for h in headings):
         issues.append("Missing 'Guided Exercises' section")
 
