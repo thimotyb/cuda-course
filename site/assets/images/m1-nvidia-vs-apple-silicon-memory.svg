@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="680" viewBox="0 0 1180 680" role="img" aria-labelledby="title desc">
+  <title id="title">NVIDIA CUDA discrete memory and Apple Silicon unified memory</title>
+  <desc id="desc">A comparison between a CUDA system with separate CPU RAM and GPU VRAM connected by an interconnect, and an Apple Silicon system where CPU, GPU, and accelerators share unified memory.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#59616d"/>
+    </marker>
+    <style>
+      .page { fill: #fffdf9; }
+      .panel { fill: #fff8f1; stroke: #d7c4b4; stroke-width: 3; rx: 22; }
+      .panel2 { fill: #f4fbff; stroke: #b8cfda; stroke-width: 3; rx: 22; }
+      .title { font: 700 34px Arial, sans-serif; fill: #171b24; }
+      .subtitle { font: 400 18px Arial, sans-serif; fill: #59616d; }
+      .head { font: 700 25px Arial, sans-serif; fill: #171b24; }
+      .label { font: 700 18px Arial, sans-serif; fill: #1f2430; }
+      .note { font: 400 16px Arial, sans-serif; fill: #4e5864; }
+      .chip { fill: #f7cfad; stroke: #b8541c; stroke-width: 2; rx: 14; }
+      .gpu { fill: #d4ecf6; stroke: #2f7895; stroke-width: 2; rx: 14; }
+      .mem { fill: #ffffff; stroke: #8f9baa; stroke-width: 2; rx: 12; }
+      .shared { fill: #e7f6eb; stroke: #4f9d64; stroke-width: 3; rx: 18; }
+      .line { stroke: #59616d; stroke-width: 4; marker-end: url(#arrow); fill: none; }
+      .line2 { stroke: #59616d; stroke-width: 4; marker-start: url(#arrow); marker-end: url(#arrow); fill: none; }
+      .dash { stroke: #8f9baa; stroke-width: 3; stroke-dasharray: 9 8; fill: none; }
+    </style>
+  </defs>
+
+  <rect class="page" width="1180" height="680"/>
+  <text class="title" x="590" y="50" text-anchor="middle">Memory Organization in Two Heterogeneous Systems</text>
+  <text class="subtitle" x="590" y="82" text-anchor="middle">CUDA on a discrete NVIDIA GPU usually separates host and device memory; Apple Silicon uses one unified memory pool.</text>
+
+  <rect class="panel" x="60" y="120" width="510" height="500"/>
+  <text class="head" x="315" y="162" text-anchor="middle">NVIDIA CUDA with discrete GPU</text>
+
+  <rect class="chip" x="105" y="215" width="155" height="90"/>
+  <text class="label" x="182" y="250" text-anchor="middle">CPU</text>
+  <text class="note" x="182" y="276" text-anchor="middle">host code</text>
+
+  <rect class="mem" x="105" y="355" width="155" height="90"/>
+  <text class="label" x="182" y="390" text-anchor="middle">CPU RAM</text>
+  <text class="note" x="182" y="416" text-anchor="middle">host memory</text>
+
+  <rect class="gpu" x="370" y="215" width="155" height="90"/>
+  <text class="label" x="448" y="250" text-anchor="middle">NVIDIA GPU</text>
+  <text class="note" x="448" y="276" text-anchor="middle">CUDA kernels</text>
+
+  <rect class="mem" x="370" y="355" width="155" height="90"/>
+  <text class="label" x="448" y="390" text-anchor="middle">GPU VRAM</text>
+  <text class="note" x="448" y="416" text-anchor="middle">device memory</text>
+
+  <path class="line" d="M182 305 L182 348"/>
+  <path class="line" d="M448 305 L448 348"/>
+  <path class="line2" d="M263 400 C300 375, 331 375, 368 400"/>
+  <text class="note" x="315" y="476" text-anchor="middle">Data often crosses an interconnect</text>
+  <text class="note" x="315" y="500" text-anchor="middle">such as PCIe or NVLink.</text>
+  <text class="note" x="315" y="552" text-anchor="middle">CUDA commonly makes host/device</text>
+  <text class="note" x="315" y="576" text-anchor="middle">data movement explicit.</text>
+
+  <rect class="panel2" x="610" y="120" width="510" height="500"/>
+  <text class="head" x="865" y="162" text-anchor="middle">Apple Silicon SoC</text>
+
+  <rect class="shared" x="690" y="360" width="350" height="105"/>
+  <text class="label" x="865" y="402" text-anchor="middle">Unified memory</text>
+  <text class="note" x="865" y="430" text-anchor="middle">one physical memory pool shared by CPU, GPU,</text>
+  <text class="note" x="865" y="454" text-anchor="middle">Neural Engine, media engines, and accelerators</text>
+
+  <rect class="chip" x="690" y="220" width="110" height="70"/>
+  <text class="label" x="745" y="262" text-anchor="middle">CPU</text>
+
+  <rect class="gpu" x="815" y="220" width="110" height="70"/>
+  <text class="label" x="870" y="262" text-anchor="middle">GPU</text>
+
+  <rect class="mem" x="940" y="220" width="100" height="70"/>
+  <text class="label" x="990" y="252" text-anchor="middle">Other</text>
+  <text class="note" x="990" y="274" text-anchor="middle">engines</text>
+
+  <path class="line" d="M745 292 L790 356"/>
+  <path class="line" d="M870 292 L870 356"/>
+  <path class="line" d="M990 292 L940 356"/>
+  <path class="dash" d="M660 190 H1070 V520 H660 Z"/>
+  <text class="note" x="865" y="540" text-anchor="middle">CPU and GPU remain different processors,</text>
+  <text class="note" x="865" y="564" text-anchor="middle">but many explicit host/device copies disappear</text>
+  <text class="note" x="865" y="588" text-anchor="middle">or become a different optimization problem.</text>
+</svg>

@@ -7,8 +7,9 @@
     "Scope",
     "0. Introductory Summary",
     "1. Fundamental Aspects of GPUs and CPUs",
-    "2. Guided Exercises",
-    "3. Appendix",
+    "2. Note on Apple Silicon",
+    "3. Guided Exercises",
+    "4. Appendix",
     "0.1 Why parallel programming became unavoidable",
     "1.1 Difference between serial, parallel, and heterogeneous computing",
     "1.2 Role of the CPU and the GPU in a modern application",
@@ -16,13 +17,15 @@
     "1.4 Examples of real applications accelerated with GPUs",
     "1.5 Benefits and limits of the parallel approach",
     "1.6 Main difficulties in parallel programming",
-    "2.1 Concept check",
-    "2.2 Reading path",
-    "3.1 Glossary: TFLOPS",
-    "3.2 Sitography"
+    "2.1 CPU, GPU, and unified memory",
+    "3.1 Concept check",
+    "3.2 Reading path",
+    "4.1 Glossary: TFLOPS",
+    "4.2 Sitography"
   ],
   "required_images": [
-    "../assets/images/m1-gpu-devotes-more-transistors-to-data-processing.png"
+    "../assets/images/m1-gpu-devotes-more-transistors-to-data-processing.png",
+    "../assets/images/m1-nvidia-vs-apple-silicon-memory.svg"
   ],
   "required_links": [
     "../index.html",
