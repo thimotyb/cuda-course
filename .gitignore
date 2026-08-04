@@ -1,0 +1,17 @@
+# CUDA/C++ build outputs
+*.o
+*.obj
+*.out
+*.exe
+*.so
+*.dll
+*.dylib
+
+# Local executables produced by lesson examples
+/examples/ch02/simple_kernel_launch/simple_kernel_launch
+/examples/ch02/vector_add/vector_add
+/examples/ch02/vector_add/a.out
+
+# Common temporary files
+*.log
+*.tmp

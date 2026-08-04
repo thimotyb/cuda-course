@@ -15,6 +15,7 @@ Confirmed workflow:
 11. Use full-screen figure zoom through `figure[data-zoomable]`.
 12. Lock finalized module content with `scripts/non_regression_guard.py`.
 13. Run non-regression checks after changes to protect finalized modules.
+14. Never expose source provenance in learner-facing summaries: do not write titles or prose such as "Book Section", "Section 2.1", "chapter 2 of the book", or references to internal book chapters/paragraphs. Use the source privately, then present the material as standalone course content.
 
 Current syllabus note:
 
