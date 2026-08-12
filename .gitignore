@@ -15,3 +15,14 @@
 # Common temporary files
 *.log
 *.tmp
+
+# Local extracted text cache from the course book PDF
+/resources/book-extracted/
+
+# Local CUDA profiler outputs
+/examples/**/*.nsys-rep
+/examples/**/*.ncu-rep
+/examples/**/*.sqlite
+
+# Windows alternate data stream metadata copied into WSL
+*:Zone.Identifier

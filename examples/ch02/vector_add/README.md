@@ -13,6 +13,8 @@ Rispetto a `simple_kernel_launch`, qui il programma:
 
 ## Compilazione
 
+Prima di compilare, verifica i prerequisiti generali nel README della cartella `examples`.
+
 ```bash
 nvcc vector_add.cu -o vector_add
 ```

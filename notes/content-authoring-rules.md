@@ -22,3 +22,8 @@ Current syllabus note:
 - The user referred to `resources/sillabo.txt`.
 - The file currently present in the workspace is `resources/sillabo-corso.txt`.
 - Until `resources/sillabo.txt` exists, use `resources/sillabo-corso.txt` and mention the mismatch when relevant.
+
+Local source cache note:
+
+- The first 6 chapters of `resources/ProgrammingMassivelyParallel-5th-ed-9780443439018.pdf` have been extracted as text under `resources/book-extracted/`.
+- `resources/book-extracted/` is intentionally listed in `.gitignore`; use it as a local search cache, not as versioned course content.

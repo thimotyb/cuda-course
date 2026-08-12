@@ -434,6 +434,38 @@ body {
   margin-top: 0.8rem;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 0.9rem;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid var(--line);
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.data-table th {
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.data-table td {
+  background: var(--surface);
+}
+
 figure[data-zoomable],
 .module-figure {
   margin: 1rem 0 0;
@@ -578,6 +610,10 @@ figure[data-zoomable] figcaption,
 }
 
 @media print {
+  @page {
+    margin: 12mm;
+  }
+
   .outline-panel,
   .top-link,
   .lang-switch,
@@ -590,6 +626,48 @@ figure[data-zoomable] figcaption,
 
   .module-layout {
     grid-template-columns: 1fr;
+  }
+
+  .shell,
+  .module-layout,
+  .panel,
+  .subtopic,
+  figure[data-zoomable],
+  .module-figure {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .shell {
+    margin: 0;
+  }
+
+  figure[data-zoomable],
+  .module-figure {
+    overflow: visible;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  figure[data-zoomable] img,
+  .module-figure img {
+    width: auto !important;
+    max-width: 100% !important;
+    max-height: 70vh;
+    object-fit: contain;
+  }
+
+  .code-listing,
+  .table-scroll {
+    max-width: 100% !important;
+    overflow: visible;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .data-table {
+    min-width: 0;
+    font-size: 0.78rem;
   }
 
   body {

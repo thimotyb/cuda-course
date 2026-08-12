@@ -18,8 +18,7 @@
     "1.9 Boundary checks in kernels",
     "1.10 Impact of memory usage on occupancy",
     "2.1 Locality exercise",
-    "2.2 Tiling exercise",
-    "Module aligned 1:1 with the syllabus section on bandwidth, memory hierarchy, data locality, tiling, and matrix multiplication."
+    "2.2 Tiling exercise"
   ],
   "required_images": [],
   "required_links": [

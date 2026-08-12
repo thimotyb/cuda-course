@@ -7,8 +7,7 @@
     "Scope",
     "1. Data Parallelism",
     "2. CUDA C++ Program Structure",
-    "3. Syllabus Topics",
-    "4. Guided Exercises",
+    "3. Guided Exercises",
     "1.1 Summary",
     "1.2 Data Parallelism vs. Task Parallelism",
     "2.1 Summary",
@@ -16,16 +15,7 @@
     "2.3 A Vector Addition Kernel",
     "2.4 Device Global Memory and Data Transfer",
     "2.5 Kernel Functions and Threading",
-    "2.6 Kernel Launch",
-    "3.1 Introduction to CUDA as a platform for parallel computing on GPUs",
-    "3.2 CPU functions and GPU kernels",
-    "3.3 Structure of a simple CUDA program",
-    "3.4 Variables, threads, blocks, and grids",
-    "3.5 Basic use of the CUDA Runtime API",
-    "3.6 Allocation, transfer, and memory release",
-    "3.7 First practical example: parallel execution of a simple vector computation",
-    "4.1 Implementation exercise",
-    "4.2 API exercise"
+    "2.6 Kernel Launch"
   ],
   "required_images": [
     "../assets/images/m2-greyscale-computation.png",

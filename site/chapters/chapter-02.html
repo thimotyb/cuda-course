@@ -17,7 +17,6 @@
       <section class="hero">
         <p><a href="../index.html">Home</a></p>
         <h1>M2 - CUDA Programming Model</h1>
-        <p class="hero-copy">Module aligned 1:1 with the syllabus section on CUDA program structure, thread hierarchy, runtime API, and the first vector example.</p>
       </section>
     </div>
   </header>
@@ -147,22 +146,10 @@ void vecAddKernel(float* A, float* B, float* C, int n)
 }</code></pre><p>Note that all the thread blocks operate on different parts of the vectors. They can be executed in any arbitrary order. Programmers must not make any assumptions regarding execution order. A small GPU with a small amount of execution resources may execute only one or two of these thread blocks in parallel. A larger GPU may execute 64 or 128 blocks in parallel. This gives CUDA kernels scalability in execution speed with hardware, that is, same code runs at lower speed on small GPUs andhigher speed on larger GPUs.</p></article>
       </section>
       <section class="panel">
-        <h2>3. Syllabus Topics</h2>
-        <article class="subtopic"><h3>3.1 Introduction to CUDA as a platform for parallel computing on GPUs</h3><p>CUDA is NVIDIA’s platform and programming model for general-purpose parallel computing on GPUs. It gives developers a way to express host-device cooperation, launch large numbers of threads, and access GPU hardware through a programming model that is close to C and C++.</p></article>
-        <article class="subtopic"><h3>3.2 CPU functions and GPU kernels</h3><p>Host functions run on the CPU and coordinate application logic. Kernels run on the GPU and are executed by many threads in parallel. This distinction is the base of CUDA program design: the host decides what work to offload, while the kernel defines how each parallel thread transforms its assigned data.</p></article>
-        <article class="subtopic"><h3>3.3 Structure of a simple CUDA program</h3><p>A simple CUDA program allocates memory, prepares data on the host, copies inputs to the device, launches a kernel, retrieves the results, checks correctness, and finally releases resources. Even the smallest example contains the full lifecycle that later appears in more advanced applications.</p></article>
-        <article class="subtopic"><h3>3.4 Variables, threads, blocks, and grids</h3><p>Threads are the smallest logical execution units. Blocks group threads that can cooperate and synchronize. A grid groups blocks belonging to one kernel launch. Variables may live on the host, in device global memory, in registers, or in block-shared memory depending on their intended use and visibility.</p></article>
-        <article class="subtopic"><h3>3.5 Basic use of the CUDA Runtime API</h3><p>The CUDA Runtime API provides the core operations needed to write beginner CUDA applications: device allocation, host-device transfers, kernel launches, synchronization, error checking, and memory release. It is the operational layer that turns the conceptual model into an executable program.</p></article>
-        <article class="subtopic"><h3>3.6 Allocation, transfer, and memory release</h3><p>In the basic CUDA model, host and device memory are separate. Inputs are allocated on the device, copied from host to device, used by the kernel, copied back to host after completion, and then released. Correct data movement is part of correctness, not only performance.</p></article>
-        <article class="subtopic"><h3>3.7 First practical example: parallel execution of a simple vector computation</h3><p>The canonical first example is vector addition. Each thread computes one output element by reading the corresponding elements from two input vectors, writing the result, and using a bounds check when the grid covers more threads than data elements.</p></article>
-      </section>
-      <section class="panel">
-        <h2>4. Guided Exercises</h2>
+        <h2>3. Guided Exercises</h2>
         <p>The complete vector addition example is available in the course repository under <a href="https://github.com/thimotyb/cuda-course/tree/master/examples/ch02/vector_add">examples/ch02/vector_add</a>. Start from the <a href="https://github.com/thimotyb/cuda-course/blob/master/examples/ch02/vector_add/README.md">README</a> in that folder for the exact compile and run instructions.</p><p>To compile the exercises locally, you need the NVIDIA CUDA Toolkit installed and <code>nvcc</code> available in your shell path. You also need an NVIDIA GPU with a compatible driver, or another environment where CUDA programs can be compiled and executed.</p><pre class="code-listing"><code>cd examples/ch02/vector_add
 nvcc vector_add.cu -o vector_add
 ./vector_add</code></pre>
-        <article class="subtopic"><h3>4.1 Implementation exercise</h3><ul class="exercise-list"><li>Implement vector addition on CPU and GPU.</li><li>Use the global index formula <code>blockIdx.x * blockDim.x + threadIdx.x</code>.</li><li>Validate results for several vector sizes, including one that is not a multiple of the block size.</li></ul></article>
-        <article class="subtopic"><h3>4.2 API exercise</h3><ul class="exercise-list"><li>List the minimum Runtime API calls needed to allocate memory, move inputs to the GPU, launch a kernel, retrieve outputs, and release memory.</li><li>State what breaks if each call is omitted.</li></ul></article>
         <button id="print-page-btn" class="print-btn print-btn-bottom" type="button" data-print>Print module</button>
       </section>
     </article>
