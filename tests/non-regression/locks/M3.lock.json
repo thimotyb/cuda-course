@@ -37,13 +37,15 @@
     "../assets/images/m3-loop-control-divergence.png",
     "../assets/images/m3-ncu-ui-report.png",
     "../assets/images/m3-ncu-ui-details.png",
-    "../assets/images/m3-windows-gpu-performance-counters.png"
+    "../assets/images/m3-windows-gpu-performance-counters.png",
+    "../assets/images/m3-reduction-nsys-ui.png"
   ],
   "required_links": [
     "../index.html",
     "chapter-02.html",
     "chapter-04.html",
     "../../examples/ch03/device_properties/README.md",
+    "../../examples/ch03/reduction_occupancy/README.md",
     "https://docs.nvidia.com/cuda/cuda-c-programming-guide/",
     "https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/",
     "https://docs.nvidia.com/cuda/blackwell-tuning-guide/",

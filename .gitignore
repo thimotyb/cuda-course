@@ -11,6 +11,7 @@
 /examples/ch02/simple_kernel_launch/simple_kernel_launch
 /examples/ch02/vector_add/vector_add
 /examples/ch02/vector_add/a.out
+/examples/ch03/reduction_occupancy/reduction
 
 # Common temporary files
 *.log

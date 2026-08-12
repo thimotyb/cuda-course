@@ -92,6 +92,21 @@ Verifica i tool installati:
 /opt/nvidia/nsight-compute/2026.2.1/ncu --version
 ```
 
+Installa anche le dipendenze GUI necessarie per aprire i report con `nsys-ui`:
+
+```bash
+sudo apt install libwayland-server0
+```
+
+Se `nsys-ui` mostra un errore come:
+
+```text
+Failed to load plugin: QuadDPlugin
+libwayland-server.so.0: cannot open shared object file: No such file or directory
+```
+
+significa che manca proprio `libwayland-server0`. Senza questa libreria la finestra principale di Nsight Systems puo' aprirsi ma restare vuota o senza funzioni selezionabili.
+
 Se la shell continua a usare una vecchia versione sotto `/usr/local/cuda-12.x/bin`, controlla tutti i path visibili e metti i binari aggiornati prima nel `PATH`:
 
 ```bash
@@ -127,3 +142,4 @@ Se `ncu` termina con `ERR_NVGPUCTRPERM`, il tool e' installato correttamente ma 
 - `ch02/simple_kernel_launch`: lancio minimo di un kernel CUDA.
 - `ch02/vector_add`: somma vettoriale con allocazione device, copie host-device, kernel GPU e verifica del risultato.
 - `ch03/device_properties`: interrogazione delle proprieta' CUDA del device con `cudaGetDeviceProperties()`.
+- `ch03/reduction_occupancy`: riduzione parallela parametrica per profilare thread block, warps, shared memory, sincronizzazione e occupancy.
