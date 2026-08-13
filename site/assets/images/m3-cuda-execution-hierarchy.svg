@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760" role="img" aria-labelledby="title desc">
+  <title id="title">CUDA execution hierarchy: grid, block, warp, thread, and SM</title>
+  <desc id="desc">A Mermaid-style flowchart showing that a CUDA kernel launch creates a grid, a grid contains blocks, blocks contain threads, threads are partitioned into 32-thread warps, and blocks are assigned to streaming multiprocessors.</desc>
+  <!--
+  Mermaid source:
+  flowchart TD
+    K[Kernel launch] --> G[Grid]
+    G --> B[Block / CTA]
+    B --> T[Thread]
+    T --> W[Warp: 32 threads]
+    GPU[GPU] --> SM[SM / Streaming Multiprocessor]
+    SM --> RB[One or more resident blocks]
+    RB --> RW[Resident warps]
+    B -. assigned whole to one SM .-> SM
+    SM -. schedules .-> W
+  -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4d5662"/>
+    </marker>
+    <marker id="dash-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7b8490"/>
+    </marker>
+    <style>
+      .page { fill: #fbfcfd; }
+      .heading { font: 700 34px Arial, sans-serif; fill: #161b22; }
+      .subheading { font: 400 18px Arial, sans-serif; fill: #59636f; }
+      .lane-title { font: 700 22px Arial, sans-serif; fill: #28313d; }
+      .box-title { font: 700 20px Arial, sans-serif; fill: #161b22; }
+      .box-text { font: 400 15px Arial, sans-serif; fill: #4d5662; }
+      .small { font: 400 14px Arial, sans-serif; fill: #4d5662; }
+      .panel { fill: #ffffff; stroke: #ccd4dd; stroke-width: 2.5; rx: 16; }
+      .logical { fill: #eaf4ff; stroke: #2f78b7; stroke-width: 2.5; rx: 14; }
+      .hardware { fill: #fff1df; stroke: #c36a1d; stroke-width: 2.5; rx: 14; }
+      .warp { fill: #edf8ef; stroke: #4f9b60; stroke-width: 2.5; rx: 14; }
+      .thread { fill: #f6f0ff; stroke: #8058b3; stroke-width: 2.5; rx: 14; }
+      .note { fill: #ffffff; stroke: #b8c0ca; stroke-width: 2; rx: 12; }
+      .line { stroke: #4d5662; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #7b8490; stroke-width: 3; stroke-dasharray: 9 8; fill: none; marker-end: url(#dash-arrow); }
+    </style>
+  </defs>
+
+  <rect class="page" width="1180" height="760"/>
+  <text class="heading" x="590" y="54" text-anchor="middle">CUDA Execution Hierarchy</text>
+  <text class="subheading" x="590" y="86" text-anchor="middle">Logical launch structure on the left, physical GPU execution on the right.</text>
+
+  <rect class="panel" x="70" y="125" width="485" height="565"/>
+  <text class="lane-title" x="312" y="165" text-anchor="middle">Logical CUDA model</text>
+
+  <rect class="logical" x="170" y="205" width="285" height="74"/>
+  <text class="box-title" x="312" y="235" text-anchor="middle">Kernel launch</text>
+  <text class="box-text" x="312" y="260" text-anchor="middle">kernel&lt;&lt;&lt;blocks, threads&gt;&gt;&gt;()</text>
+
+  <rect class="logical" x="170" y="320" width="285" height="74"/>
+  <text class="box-title" x="312" y="350" text-anchor="middle">Grid</text>
+  <text class="box-text" x="312" y="375" text-anchor="middle">all blocks in one kernel launch</text>
+
+  <rect class="logical" x="170" y="435" width="285" height="74"/>
+  <text class="box-title" x="312" y="465" text-anchor="middle">Block / CTA</text>
+  <text class="box-text" x="312" y="490" text-anchor="middle">threads that can share memory</text>
+
+  <rect class="thread" x="170" y="550" width="285" height="74"/>
+  <text class="box-title" x="312" y="580" text-anchor="middle">Thread</text>
+  <text class="box-text" x="312" y="605" text-anchor="middle">one logical instance of the kernel</text>
+
+  <path class="line" d="M312 280 L312 315"/>
+  <path class="line" d="M312 395 L312 430"/>
+  <path class="line" d="M312 510 L312 545"/>
+
+  <rect class="panel" x="625" y="125" width="485" height="565"/>
+  <text class="lane-title" x="868" y="165" text-anchor="middle">Physical execution model</text>
+
+  <rect class="hardware" x="725" y="205" width="285" height="74"/>
+  <text class="box-title" x="868" y="235" text-anchor="middle">GPU</text>
+  <text class="box-text" x="868" y="260" text-anchor="middle">many streaming multiprocessors</text>
+
+  <rect class="hardware" x="725" y="320" width="285" height="74"/>
+  <text class="box-title" x="868" y="350" text-anchor="middle">SM</text>
+  <text class="box-text" x="868" y="375" text-anchor="middle">schedules resident work</text>
+
+  <rect class="hardware" x="725" y="435" width="285" height="74"/>
+  <text class="box-title" x="868" y="465" text-anchor="middle">Resident block(s)</text>
+  <text class="box-text" x="868" y="490" text-anchor="middle">each block stays on one SM</text>
+
+  <rect class="warp" x="725" y="550" width="285" height="74"/>
+  <text class="box-title" x="868" y="580" text-anchor="middle">Warp</text>
+  <text class="box-text" x="868" y="605" text-anchor="middle">32 CUDA threads scheduled together</text>
+
+  <path class="line" d="M868 280 L868 315"/>
+  <path class="line" d="M868 395 L868 430"/>
+  <path class="line" d="M868 510 L868 545"/>
+
+  <path class="dash" d="M456 472 C552 472, 617 472, 719 472"/>
+  <text class="small" x="590" y="454" text-anchor="middle">a whole block is assigned to one SM</text>
+
+  <path class="dash" d="M456 587 C552 635, 617 635, 719 587"/>
+  <text class="small" x="590" y="648" text-anchor="middle">block threads are partitioned into warps</text>
+
+  <rect class="note" x="126" y="708" width="928" height="34"/>
+  <text class="small" x="590" y="730" text-anchor="middle">A grid contains blocks; a block contains threads; hardware groups block threads into 32-thread warps; SMs host blocks and schedule their warps.</text>
+</svg>

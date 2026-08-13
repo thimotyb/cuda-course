@@ -25,7 +25,9 @@
     "2.5 Profiling and monitoring tools",
     "3.1 Architecture reasoning",
     "3.2 Divergence and scheduling exercise",
-    "3.3 Device property exercise"
+    "3.3 Device property exercise",
+    "3.5 Recap",
+    "3.6 Sitography"
   ],
   "required_images": [
     "../assets/images/m3-gpu-compute-architecture.png",
@@ -38,7 +40,8 @@
     "../assets/images/m3-ncu-ui-report.png",
     "../assets/images/m3-ncu-ui-details.png",
     "../assets/images/m3-windows-gpu-performance-counters.png",
-    "../assets/images/m3-reduction-nsys-ui.png"
+    "../assets/images/m3-reduction-nsys-ui.png",
+    "../assets/images/m3-cuda-execution-hierarchy.svg"
   ],
   "required_links": [
     "../index.html",
