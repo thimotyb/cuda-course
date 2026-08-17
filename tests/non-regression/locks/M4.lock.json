@@ -17,7 +17,8 @@
     "1.8 Boundary checks in kernels",
     "1.9 Impact of memory usage on occupancy",
     "2.1 Locality exercise",
-    "2.2 Tiling exercise"
+    "2.2 Tiling exercise",
+    "2.3 Register and occupancy exercise"
   ],
   "required_images": [
     "../assets/images/m4-cuda-device-memory-model.png",
@@ -42,6 +43,8 @@
     "https://bestvaluegpu.com/history/new-and-used-rtx-5080-price-history-and-specs/",
     "https://www.nvidia.com/en-us/geforce/graphics-cards/compare/?section=compare-20",
     "https://www.engadget.com/gaming/pc/nvidia-rtx-5060-ti-16gb-review-a-solid-semi-budget-gpu-for-429-but-good-luck-scoring-that-price-130058124.html",
-    "https://www.videocardbenchmark.net/gpu.php?gpu=GeForce+RTX+5060+Ti+16GB&id=6160"
+    "https://www.videocardbenchmark.net/gpu.php?gpu=GeForce+RTX+5060+Ti+16GB&id=6160",
+    "../../examples/ch04/tiled_matrix_mul_square/README.md",
+    "../../examples/ch04/register_occupancy_tradeoff/README.md"
   ]
 }

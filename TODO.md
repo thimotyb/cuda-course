@@ -19,6 +19,9 @@
 
 - Add a pinned-memory transfer demo. The demo should compare ordinary pageable host memory against pinned/page-locked host memory and show that pinned memory can make large host-device transfers faster.
   Suggested scope:
+  - add a short conceptual explanation of what pinned/page-locked host memory means and why the operating system cannot freely page or move it;
+  - explain when pinned memory is useful: large host-device transfers, `cudaMemcpyAsync`, streams, and overlap between copies and kernel execution;
+  - include a compact code example that shows the allocation, copy, timing, and cleanup flow end to end;
   - allocate the pageable version with standard host allocation, such as `std::vector<float>` or `malloc`;
   - allocate the pinned version with `cudaMallocHost` or `cudaHostAlloc`;
   - copy the same large buffer from host to device and device to host in both versions;
@@ -32,5 +35,6 @@
   - explain the difference between local inference on owned hardware, rented GPU inference, and managed API pricing;
   - introduce tokens/second per user, batch size, utilization, model size, quantization, memory capacity, and power cost as the main variables;
   - include a worked example for H100-class inference cost per million tokens;
+  - add a practical vLLM section showing how to host an open LLM locally or on a rented GPU, expose an OpenAI-compatible endpoint, and observe GPU memory use, throughput, batching, and latency;
   - candidate reference point to verify before publishing: NVIDIA H100 GPU FAQs report inference at approximately `$0.09` per million tokens at `66 TPS/user` for GPT-OSS-120B using vLLM, based on SemiAnalysis InferenceX benchmarks as of April 2026;
   - compare this with a local Blackwell consumer GPU example, clearly separating hardware purchase cost, electricity, amortization, and achievable throughput.

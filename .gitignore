@@ -12,6 +12,8 @@
 /examples/ch02/vector_add/vector_add
 /examples/ch02/vector_add/a.out
 /examples/ch03/reduction_occupancy/reduction
+/examples/ch04/register_occupancy_tradeoff/register_occupancy_tradeoff
+/examples/ch04/tiled_matrix_mul_square/tiled_matrix_mul_square
 
 # Common temporary files
 *.log
