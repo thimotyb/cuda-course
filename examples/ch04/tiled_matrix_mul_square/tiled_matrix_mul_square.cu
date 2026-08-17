@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -8,6 +9,11 @@
 #ifndef TILE_WIDTH
 #define TILE_WIDTH 32
 #endif
+
+// This file is the short teaching version of tiled matrix multiplication.
+// It deliberately supports only square matrices whose Width is a multiple of
+// TILE_WIDTH, so the kernel can focus on tiling and shared memory without the
+// extra boundary checks needed in production code.
 
 static void checkCuda(cudaError_t result, const char *message) {
   if (result != cudaSuccess) {
@@ -31,33 +37,61 @@ static int parseInt(const char *value, const char *name) {
 // multiple of TILE_WIDTH, so every thread loads valid M and N elements.
 __global__ void matrixMulKernel(const float *M, const float *N, float *P,
                                 int Width) {
+  // Shared memory is allocated once per block. All threads in the block
+  // cooperate to fill these two tiles, then reuse them for TILE_WIDTH multiply
+  // accumulate steps.
   __shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
   __shared__ float Nds[TILE_WIDTH][TILE_WIDTH];
 
+  // Short names match the notation used in the course material and make the
+  // index formulas easier to compare with the diagrams.
   int bx = blockIdx.x;
   int by = blockIdx.y;
   int tx = threadIdx.x;
   int ty = threadIdx.y;
 
+  // Each block computes one TILE_WIDTH x TILE_WIDTH output tile. Each thread
+  // computes exactly one output element P[Row, Col].
   int Row = by * TILE_WIDTH + ty;
   int Col = bx * TILE_WIDTH + tx;
 
+  // Pvalue is private to one thread. In a typical compilation it lives in a
+  // register and accumulates the dot product for one output element.
   float Pvalue = 0.0f;
 
+  // ph is the phase index. Each phase loads one tile from M and one tile from N.
+  // Because Width is a multiple of TILE_WIDTH, Width / TILE_WIDTH is exact.
   for (int ph = 0; ph < Width / TILE_WIDTH; ++ph) {
+    // Cooperative tile loading:
+    // - thread (ty, tx) loads one M element into Mds[ty][tx]
+    // - thread (ty, tx) loads one N element into Nds[ty][tx]
+    // No boundary checks are needed in this version because invalid edge tiles
+    // are rejected by the host-side Width % TILE_WIDTH check.
     Mds[ty][tx] = M[Row * Width + ph * TILE_WIDTH + tx];
     Nds[ty][tx] = N[(ph * TILE_WIDTH + ty) * Width + Col];
+
+    // Read-after-write synchronization: every thread must wait until the full
+    // M and N tiles are present in shared memory before any thread consumes them.
     __syncthreads();
 
+    // Reuse the two shared-memory tiles. Each thread walks across one row of
+    // Mds and one column of Nds, accumulating TILE_WIDTH products.
     for (int k = 0; k < TILE_WIDTH; ++k) {
       Pvalue += Mds[ty][k] * Nds[k][tx];
     }
+
+    // Write-after-read synchronization: no thread may overwrite Mds/Nds with
+    // the next phase's tiles until all threads are done reading the current ones.
     __syncthreads();
   }
 
+  // Since all output coordinates are valid in this square teaching version, the
+  // final store also needs no boundary check.
   P[Row * Width + Col] = Pvalue;
 }
 
+// CPU reference implementation used only for correctness checking. It is not
+// timed, and it intentionally uses the direct triple-loop form for clarity.
 static void cpuMatrixMul(const std::vector<float> &M,
                          const std::vector<float> &N, std::vector<float> &P,
                          int Width) {
@@ -101,6 +135,8 @@ int main(int argc, char **argv) {
   }
 
   if (Width % TILE_WIDTH != 0) {
+    // This keeps the kernel simple enough for a first tiling explanation. A
+    // production kernel would keep this case and add boundary checks instead.
     std::fprintf(stderr,
                  "Width must be a multiple of TILE_WIDTH. Width=%d, "
                  "TILE_WIDTH=%d.\n",
@@ -122,6 +158,7 @@ int main(int argc, char **argv) {
   std::vector<float> host_P(elements, 0.0f);
   std::vector<float> host_expected(elements, 0.0f);
 
+  // Deterministic values make runs reproducible and avoid storing input files.
   for (int row = 0; row < Width; ++row) {
     for (int col = 0; col < Width; ++col) {
       host_M[row * Width + col] = static_cast<float>((row + col) % 13) * 0.25f;
@@ -144,6 +181,7 @@ int main(int argc, char **argv) {
   dim3 dimBlock(TILE_WIDTH, TILE_WIDTH, 1);
   dim3 dimGrid(Width / TILE_WIDTH, Width / TILE_WIDTH, 1);
 
+  // Warm up once before timing so one-time setup does not dominate the average.
   matrixMulKernel<<<dimGrid, dimBlock>>>(device_M, device_N, device_P, Width);
   checkCuda(cudaGetLastError(), "warmup kernel launch failed");
   checkCuda(cudaDeviceSynchronize(), "warmup kernel failed");
@@ -153,6 +191,8 @@ int main(int argc, char **argv) {
   checkCuda(cudaEventCreate(&start), "cudaEventCreate start failed");
   checkCuda(cudaEventCreate(&stop), "cudaEventCreate stop failed");
 
+  // CUDA events measure elapsed time on the GPU timeline. Host allocation,
+  // host-device copies, and CPU verification are outside the timed region.
   checkCuda(cudaEventRecord(start), "cudaEventRecord start failed");
   for (int i = 0; i < iterations; ++i) {
     matrixMulKernel<<<dimGrid, dimBlock>>>(device_M, device_N, device_P, Width);
@@ -169,13 +209,22 @@ int main(int argc, char **argv) {
   checkCuda(cudaMemcpy(host_P.data(), device_P, bytes, cudaMemcpyDeviceToHost),
             "cudaMemcpy P failed");
 
+  auto cpu_start = std::chrono::high_resolution_clock::now();
   cpuMatrixMul(host_M, host_N, host_expected, Width);
+  auto cpu_stop = std::chrono::high_resolution_clock::now();
+  double cpu_ms =
+      std::chrono::duration<double, std::milli>(cpu_stop - cpu_start).count();
+
   double error = maxAbsError(host_expected, host_P);
   bool pass = error < 1.0e-3 * static_cast<double>(Width);
 
+  // A dense square matrix multiply performs Width^3 multiply-add pairs, counted
+  // here as 2 * Width^3 floating-point operations.
   double flops = 2.0 * static_cast<double>(Width) *
                  static_cast<double>(Width) * static_cast<double>(Width);
   double gflops = flops / (static_cast<double>(average_ms) * 1.0e-3) / 1.0e9;
+  double cpu_gflops = flops / (cpu_ms * 1.0e-3) / 1.0e9;
+  double speedup = cpu_ms / static_cast<double>(average_ms);
   size_t shared_bytes_per_block =
       2ULL * TILE_WIDTH * TILE_WIDTH * sizeof(float);
 
@@ -186,8 +235,11 @@ int main(int argc, char **argv) {
   std::printf("block: (%u, %u, %u)\n", dimBlock.x, dimBlock.y, dimBlock.z);
   std::printf("shared memory per block: %zu bytes\n", shared_bytes_per_block);
   std::printf("iterations: %d\n", iterations);
-  std::printf("average kernel time: %.6f ms\n", average_ms);
-  std::printf("effective throughput: %.2f GFLOP/s\n", gflops);
+  std::printf("average GPU kernel time: %.6f ms\n", average_ms);
+  std::printf("GPU kernel throughput: %.2f GFLOP/s\n", gflops);
+  std::printf("CPU triple-loop time: %.6f ms\n", cpu_ms);
+  std::printf("CPU triple-loop throughput: %.2f GFLOP/s\n", cpu_gflops);
+  std::printf("GPU kernel speedup vs CPU triple loop: %.2fx\n", speedup);
   std::printf("max absolute error: %.6e\n", error);
   std::printf("%s\n", pass ? "PASS" : "FAIL");
 

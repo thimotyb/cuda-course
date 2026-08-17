@@ -5,6 +5,10 @@
 #include <cstdlib>
 #include <vector>
 
+// This example is intentionally built around several versions of the same
+// kernel. Each version has a different compile-time RegisterLevel, which creates
+// different register pressure and lets us observe the effect on occupancy.
+
 static void checkCuda(cudaError_t result, const char *message) {
   if (result != cudaSuccess) {
     std::fprintf(stderr, "%s: %s\n", message, cudaGetErrorString(result));
@@ -53,19 +57,28 @@ static bool isSupportedRegisterLevel(int register_level) {
          register_level == 128;
 }
 
+// RegisterLevel is a compile-time constant, so nvcc can generate a separate
+// kernel body for each level. This is useful for teaching because each variant
+// has a stable register footprint that can be queried and profiled.
 template <int RegisterLevel>
 __global__ void registerPressureKernel(const float *input, float *output,
                                        unsigned long long n,
                                        int arithmetic_rounds) {
+  // One-dimensional global thread index. Each thread processes one element.
   unsigned long long i =
       static_cast<unsigned long long>(blockIdx.x) * blockDim.x + threadIdx.x;
   if (i >= n) {
     return;
   }
 
+  // This private array is the source of register pressure. Because its size is
+  // known at compile time and later accessed with fixed indices, the compiler
+  // can usually scalarize many entries into individual registers.
   float regs[RegisterLevel];
   float seed = input[i] + static_cast<float>(threadIdx.x & 31) * 0.001f;
 
+// Unrolling exposes all array elements to the compiler. That makes the example
+// more likely to use registers instead of loop-indexed local memory.
 #pragma unroll
   for (int r = 0; r < RegisterLevel; ++r) {
     regs[r] = seed + static_cast<float>(r) * 0.01f;
@@ -77,6 +90,8 @@ __global__ void registerPressureKernel(const float *input, float *output,
   for (int round = 0; round < arithmetic_rounds; ++round) {
 #pragma unroll
     for (int r = 0; r < RegisterLevel; ++r) {
+      // fmaf performs a fused multiply-add and keeps the values live across many
+      // instructions, which helps create visible register pressure.
       regs[r] = fmaf(regs[r], 1.000001f,
                      static_cast<float>((r % 7) + 1) * 0.000001f);
     }
@@ -91,11 +106,15 @@ __global__ void registerPressureKernel(const float *input, float *output,
   output[i] = sum;
 }
 
+// The CUDA occupancy API expects a function pointer. These wrappers let runtime
+// code select one of the compile-time kernel variants from an integer argument.
 template <int RegisterLevel>
 static void *kernelPtr() {
   return reinterpret_cast<void *>(&registerPressureKernel<RegisterLevel>);
 }
 
+// cudaFuncGetAttributes reports the compiler's actual resource use for one
+// kernel variant, including the real number of registers per thread.
 template <int RegisterLevel>
 static cudaFuncAttributes kernelAttributes() {
   cudaFuncAttributes attrs{};
@@ -104,6 +123,8 @@ static cudaFuncAttributes kernelAttributes() {
   return attrs;
 }
 
+// Launch wrapper for one compile-time variant. The switch in launchForLevel()
+// chooses which instantiation to call.
 template <int RegisterLevel>
 static void launchKernel(int blocks, int block_size, const float *device_input,
                          float *device_output, unsigned long long n,
@@ -134,10 +155,13 @@ struct RunResult {
 };
 
 static long long registersPerBlock(int block_size, int registers_per_thread) {
+  // This is the resource equation we want students to internalize.
   return static_cast<long long>(block_size) *
          static_cast<long long>(registers_per_thread);
 }
 
+// Map the user's register-pressure level to the matching compile-time kernel
+// instantiation. Unsupported values are rejected to keep the output predictable.
 static cudaFuncAttributes attributesForLevel(int register_level) {
   switch (register_level) {
   case 8:
@@ -245,6 +269,10 @@ static RunResult runOnce(const RunConfig &config, const cudaDeviceProp &prop,
   int blocks = static_cast<int>(blocks_ull);
 
   cudaFuncAttributes attrs = attributesForLevel(config.register_level);
+
+  // Reject configurations that cannot launch at all. This can happen when the
+  // requested block size multiplied by the actual compiler register count
+  // exceeds the device's register-per-block limit.
   long long requested_registers_per_block =
       registersPerBlock(config.block_size, attrs.numRegs);
   if (requested_registers_per_block > prop.regsPerBlock) {
@@ -257,6 +285,8 @@ static RunResult runOnce(const RunConfig &config, const cudaDeviceProp &prop,
     std::exit(1);
   }
 
+  // Ask the CUDA Runtime how many blocks of this kernel can be resident on one
+  // SM, taking into account register use, block size, and other launch limits.
   int active_blocks_per_sm = 0;
   checkCuda(cudaOccupancyMaxActiveBlocksPerMultiprocessor(
                 &active_blocks_per_sm, kernelPtrForLevel(config.register_level),
@@ -270,6 +300,9 @@ static RunResult runOnce(const RunConfig &config, const cudaDeviceProp &prop,
     std::exit(1);
   }
 
+  // Convert resident blocks to resident warps, then to the theoretical
+  // occupancy percentage. This is the same quantity students later compare with
+  // Nsight Compute's occupancy report.
   int active_warps_per_sm =
       active_blocks_per_sm * ((config.block_size + prop.warpSize - 1) /
                               prop.warpSize);
@@ -278,6 +311,8 @@ static RunResult runOnce(const RunConfig &config, const cudaDeviceProp &prop,
       100.0f * static_cast<float>(active_warps_per_sm) /
       static_cast<float>(max_warps_per_sm);
 
+  // Warm up once before timing. This keeps one-time launch/setup costs out of
+  // the averaged measurement.
   launchForLevel(config.register_level, blocks, config.block_size, device_input,
                  device_output, config.n, config.arithmetic_rounds);
   checkCuda(cudaGetLastError(), "warmup kernel launch failed");
@@ -288,6 +323,8 @@ static RunResult runOnce(const RunConfig &config, const cudaDeviceProp &prop,
   checkCuda(cudaEventCreate(&start), "cudaEventCreate start failed");
   checkCuda(cudaEventCreate(&stop), "cudaEventCreate stop failed");
 
+  // CUDA events measure elapsed time on the GPU timeline. We time only repeated
+  // kernel launches, not host allocation, host-device copies, or result checks.
   checkCuda(cudaEventRecord(start), "cudaEventRecord start failed");
   for (int i = 0; i < config.iterations; ++i) {
     launchForLevel(config.register_level, blocks, config.block_size,
@@ -404,6 +441,8 @@ int main(int argc, char **argv) {
   printTableTitle();
 
   if (sweep) {
+    // Sweep mode is a compact way to see the trend before opening Nsight
+    // Compute: increasing register pressure often reduces blocks/SM and warps/SM.
     const int block_sizes[] = {64, 128, 256, 512, 1024};
     const int register_levels[] = {8, 16, 32, 64, 96, 128};
     for (int block_size : block_sizes) {
@@ -414,6 +453,8 @@ int main(int argc, char **argv) {
         cudaFuncAttributes attrs = attributesForLevel(register_level);
         long long regs_per_block = registersPerBlock(block_size, attrs.numRegs);
         if (regs_per_block > prop.regsPerBlock) {
+          // Some combinations are impossible on the current GPU. We skip them
+          // instead of aborting so the rest of the sweep still teaches the trend.
           std::printf("skipping block=%d level=%d: %lld registers/block exceeds "
                       "device limit %d\n",
                       block_size, register_level, regs_per_block,

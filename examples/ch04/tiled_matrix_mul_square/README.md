@@ -70,6 +70,9 @@ shared memory per block: 8192 bytes
 iterations: 20
 average kernel time: ... ms
 effective throughput: ... GFLOP/s
+CPU triple-loop time: ... ms
+CPU triple-loop throughput: ... GFLOP/s
+GPU kernel speedup vs CPU triple loop: ...x
 max absolute error: ...
 PASS
 ```
@@ -78,6 +81,12 @@ Il programma verifica il risultato con una moltiplicazione CPU e stampa il throu
 
 ```text
 2 x Width x Width x Width FLOP / tempo_kernel
+```
+
+Il tempo GPU stampato misura solo il kernel, non le copie host-device. Il tempo CPU misura il triplo `for` usato come riferimento correttezza. Lo speedup stampato confronta quindi:
+
+```text
+tempo CPU triplo for / tempo medio kernel GPU
 ```
 
 ## 5. Lettura del kernel
