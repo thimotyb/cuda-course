@@ -5,7 +5,7 @@
     "M3 - GPU Compute Architecture",
     "Learning outcomes",
     "Scope",
-    "1. Syllabus Topics",
+    "1. GPU Execution Architecture",
     "2. NVIDIA GPU Architecture Families",
     "3. Guided Exercises",
     "1.1 General structure of a modern GPU",
@@ -25,9 +25,7 @@
     "2.5 Profiling and monitoring tools",
     "3.1 Architecture reasoning",
     "3.2 Divergence and scheduling exercise",
-    "3.3 Device property exercise",
-    "3.5 Recap",
-    "3.6 Sitography"
+    "3.3 Device property exercise"
   ],
   "required_images": [
     "../assets/images/m3-gpu-compute-architecture.png",

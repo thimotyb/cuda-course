@@ -26,7 +26,7 @@
       <section class="panel"><nav class="module-nav" aria-label="Module navigation"><a href="chapter-01.html">M1 Previous</a><span>M2</span><a href="chapter-03.html">M3 Next</a></nav></section>
       <section class="panel info-grid">
         <div><h2>Learning outcomes</h2><ul class="meta-list"><li>Understand how host and device code coexist in CUDA.</li><li>Use grids, blocks, and thread indices correctly.</li><li>Follow the full memory-allocation and transfer flow of a simple program.</li></ul></div>
-        <div><h2>Scope</h2><p>This module follows exactly the second syllabus block, from the definition of CUDA through the first practical vector computation.</p></div>
+        <div><h2>Scope</h2><p>This module builds the first working CUDA mental model: a CPU program allocates device memory, copies input data to the GPU, launches a kernel over a grid of threads, and copies results back. The focus is on writing and reading small CUDA C++ programs correctly, especially how each thread identifies the data element it owns.</p></div>
       </section>
       <section class="panel">
         <h2>1. Data Parallelism</h2>
