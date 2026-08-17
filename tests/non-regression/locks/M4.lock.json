@@ -14,8 +14,7 @@
     "1.5 CPU vs. GPU register architecture",
     "1.6 The tiling technique",
     "1.7 Practical example: matrix multiplication with tiling",
-    "1.8 Boundary checks in kernels",
-    "1.9 Impact of memory usage on occupancy",
+    "1.8 Impact of memory usage on occupancy",
     "2.1 Locality exercise",
     "2.2 Tiling exercise",
     "2.3 Matrix multiplication implementation comparison",
@@ -25,7 +24,10 @@
     "../assets/images/m4-cuda-device-memory-model.png",
     "../assets/images/m4-cuda-memory-types.png",
     "../assets/images/m4-shared-memory-vs-registers.png",
-    "../assets/images/m4-cuda-memory-declaration-qualifiers.png"
+    "../assets/images/m4-cuda-memory-declaration-qualifiers.png",
+    "../assets/images/m4-matrix-multiplication-small-example.png",
+    "../assets/images/m4-block-00-global-memory-accesses.png",
+    "../assets/images/m4-matrix-tiling-shared-memory.png"
   ],
   "required_links": [
     "../index.html",
