@@ -14,6 +14,7 @@
 /examples/ch03/reduction_occupancy/reduction
 /examples/ch04/register_occupancy_tradeoff/register_occupancy_tradeoff
 /examples/ch04/tiled_matrix_mul_square/tiled_matrix_mul_square
+/examples/ch04/cublas_matrix_mul_compare/cublas_matrix_mul_compare
 
 # Common temporary files
 *.log

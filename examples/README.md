@@ -145,3 +145,4 @@ Se `ncu` termina con `ERR_NVGPUCTRPERM`, il tool e' installato correttamente ma 
 - `ch03/reduction_occupancy`: riduzione parallela parametrica per profilare thread block, warps, shared memory, sincronizzazione e occupancy.
 - `ch04/register_occupancy_tradeoff`: kernel parametrico per confrontare thread per blocco, pressione sui registri, occupancy teorica e tempo di esecuzione.
 - `ch04/tiled_matrix_mul_square`: moltiplicazione di matrici quadrate con tiling e shared memory, senza boundary checks.
+- `ch04/cublas_matrix_mul_compare`: confronto tra triplo `for` CPU, tiled kernel didattico e `cuBLAS SGEMM`.

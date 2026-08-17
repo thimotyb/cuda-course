@@ -18,7 +18,8 @@
     "1.9 Impact of memory usage on occupancy",
     "2.1 Locality exercise",
     "2.2 Tiling exercise",
-    "2.3 Register and occupancy exercise"
+    "2.3 Matrix multiplication implementation comparison",
+    "2.4 Register and occupancy exercise"
   ],
   "required_images": [
     "../assets/images/m4-cuda-device-memory-model.png",
@@ -45,6 +46,7 @@
     "https://www.engadget.com/gaming/pc/nvidia-rtx-5060-ti-16gb-review-a-solid-semi-budget-gpu-for-429-but-good-luck-scoring-that-price-130058124.html",
     "https://www.videocardbenchmark.net/gpu.php?gpu=GeForce+RTX+5060+Ti+16GB&id=6160",
     "../../examples/ch04/tiled_matrix_mul_square/README.md",
+    "../../examples/ch04/cublas_matrix_mul_compare/README.md",
     "../../examples/ch04/register_occupancy_tradeoff/README.md"
   ]
 }
