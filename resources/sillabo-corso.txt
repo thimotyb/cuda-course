@@ -44,7 +44,7 @@ Esempio pratico: moltiplicazione di matrici con tiling.
 Controlli sui bordi nei kernel.
 Impatto dell’uso della memoria sull’occupancy.
 ________________________________________
-5. Misurazione delle prestazioni
+5. Misurazione delle prestazioni   ----> CAPITOLO 9 in https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html
 Metriche principali per valutare le prestazioni.
 Misurazione dei tempi lato CPU.
 Uso dei timer CUDA lato GPU.
