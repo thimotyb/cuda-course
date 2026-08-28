@@ -2,11 +2,14 @@
 set -euo pipefail
 
 CONTAINER_NAME="m9-vllm-qwen"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 MODEL="${MODEL:-Qwen/Qwen3-0.6B}"
 PORT="${PORT:-8001}"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-4096}"
 GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.80}"
 HF_CACHE_DIR="${HF_CACHE_DIR:-$HOME/.cache/huggingface}"
+REPORT_DIR="${REPORT_DIR:-$REPO_ROOT/reports/m9/vllm}"
 VLLM_WSL2_ENABLE_PIN_MEMORY="${VLLM_WSL2_ENABLE_PIN_MEMORY:-1}"
 
 if ! docker info >/dev/null 2>&1; then
@@ -21,6 +24,7 @@ if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
 fi
 
 mkdir -p "$HF_CACHE_DIR"
+mkdir -p "$REPORT_DIR"
 
 docker_args=(
   run --detach
@@ -29,7 +33,9 @@ docker_args=(
   --ipc=host
   --publish "$PORT:8000"
   --volume "$HF_CACHE_DIR:/root/.cache/huggingface"
+  --volume "$REPORT_DIR:/reports"
   --env "VLLM_WSL2_ENABLE_PIN_MEMORY=$VLLM_WSL2_ENABLE_PIN_MEMORY"
+  --env "VLLM_WORKER_MULTIPROC_METHOD=spawn"
 )
 
 if [[ -n "${HF_TOKEN:-}" ]]; then
@@ -41,6 +47,7 @@ docker_args+=(
   "$MODEL"
   --max-model-len "$MAX_MODEL_LEN"
   --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION"
+  --profiler-config '{"profiler":"torch","torch_profiler_dir":"/reports","torch_profiler_record_shapes":true,"torch_profiler_with_memory":true,"torch_profiler_use_gzip":true,"ignore_frontend":true}'
 )
 
 echo "Starting vLLM container '$CONTAINER_NAME' with model '$MODEL'..."

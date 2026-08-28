@@ -49,7 +49,19 @@ In a second terminal:
 .venv/bin/python examples/ch09/vllm_docker_demo/client.py
 ```
 
-The client prints end-to-end latency, generated-token count, approximate generation throughput, and the response text. Thinking output is disabled by default so that the small token budget produces a visible answer; pass `--enable-thinking` to expose Qwen3's reasoning output and its effect on the token budget.
+The client prints end-to-end latency, the finish reason, generated-token count, approximate generation throughput, and the response text. Thinking output is disabled by default so that the small token budget produces a visible answer; pass `--enable-thinking` to expose Qwen3's reasoning output and its effect on the token budget. A finish reason of `length` means that `--max-tokens` was reached; `stop` means that the model ended the response normally.
+
+## Capture a profiler trace
+
+The launcher binds `reports/m9/vllm` on the host to `/reports` in the container and configures vLLM's PyTorch profiler. Profile one short request explicitly:
+
+```bash
+.venv/bin/python examples/ch09/vllm_docker_demo/client.py --profile --max-tokens 32
+```
+
+The client starts the profiling range before the request and stops it afterwards. vLLM then flushes trace files into `reports/m9/vllm`. Open the generated trace with [Perfetto](https://ui.perfetto.dev/) or another Chrome-trace-compatible viewer. Profiling adds significant overhead, so do not use `--profile` for normal throughput comparisons.
+
+This produces PyTorch profiler traces, not `.nsys-rep` or `.ncu-rep` files. Nsight Systems and Nsight Compute require their CLI tools in the environment that launches the vLLM process and need a separate profiling image or command-line workflow.
 
 Try a different prompt or generation limit:
 

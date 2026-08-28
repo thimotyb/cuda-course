@@ -25,6 +25,7 @@ __pycache__/
 
 # Local extracted text cache from the course book PDF
 /resources/book-extracted/
+/reports/
 
 # Local CUDA profiler outputs
 /examples/**/*.nsys-rep

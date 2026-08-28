@@ -218,6 +218,8 @@ The final profiling command should write reports under a mounted path such as `/
 
 Do not put large model files or profiler reports into Git. Keep the report directory ignored or document it as a local exercise output directory.
 
+The first working prototype binds the host directory `reports/m9/vllm` to `/reports` and configures vLLM's PyTorch profiler with an absolute output path. Running the client with `--profile` calls `/start_profile`, sends one request, then calls `/stop_profile`. On the development machine this produced a compressed PyTorch trace (`rank0...pt.trace.json.gz`, approximately 1.7 MB) and `profiler_out_0.txt` in the host directory. The trace can be opened in <https://ui.perfetto.dev/>.
+
 ## Container permissions and limitations
 
 The GPU must be exposed with `--gpus all` or the equivalent runtime configuration. Docker's default security profile can block `perf_event_open`, which affects some Nsight Systems CPU sampling features. `nsys status --environment` should be used to check the environment before profiling.
@@ -246,3 +248,154 @@ Other practical limitations:
 - [ ] Test `nvidia-smi`, Nsight Systems, and selected Nsight Compute workflows on the target GPU.
 - [ ] Document profiler permissions and the difference between profiling data and benchmark data.
 - [ ] Add only stable, verified instructions to the learner-facing module after the implementation is tested.
+
+## Teaching exercise design: profiler-led efficiency lab
+
+The useful demonstration is not simply showing that the GPU is busy. The exercise should compare equivalent workloads under different serving configurations and use profiling data to explain why one configuration is more efficient.
+
+The comparison must keep the following variables controlled:
+
+- same GPU;
+- same model and data type;
+- same total number of input and output tokens;
+- same context and generation limits unless context length is the variable under test;
+- separate warm-up from steady-state measurements;
+- separate normal benchmark runs from profiler runs.
+
+The target conclusion is not that one setting is always faster. It should explain which bottleneck is dominant and why a particular configuration improves throughput, latency, or memory capacity for the tested workload.
+
+### Experiment 1: single request versus concurrent requests
+
+Run the same workload with concurrency levels such as `1`, `4`, `8`, and `16`. Measure:
+
+- time to first token (TTFT);
+- time per output token (TPOT);
+- inter-token latency (ITL);
+- end-to-end latency per request;
+- aggregate tokens per second;
+- GPU memory and KV-cache usage;
+- request completion rate and P99 latency.
+
+This experiment makes batching, scheduling, latency hiding, and the throughput/latency trade-off visible. A single request may leave parts of the GPU underused, while concurrent requests expose more independent work to the engine. Higher concurrency can eventually increase queueing, memory pressure, and tail latency.
+
+Prefer `vllm bench serve` with streaming measurements when the installed image provides it. It reports TTFT, TPOT, ITL, throughput, and latency percentiles more precisely than a client that measures only the complete HTTP response. Repeating a benchmark against the same server can reuse prefix-cache entries and inflate throughput, so restart the server, vary the seed, or otherwise control cache reuse between comparable runs.
+
+### Experiment 2: short context versus long context
+
+Keep the generated-token limit fixed and vary the input context, for example:
+
+```text
+128 tokens
+1024 tokens
+4096 tokens
+```
+
+Observe the difference between:
+
+- prefill: processing the input prompt;
+- decode: generating output tokens autoregressively;
+- KV-cache allocation and growth;
+- latency to the first token;
+- steady-state token generation speed.
+
+This connects memory capacity and locality to a real LLM workload. Longer contexts increase the amount of initial work and the memory required for attention state. A model can fit comfortably for one short request and still approach the memory limit when context length or concurrency grows.
+
+### Experiment 3: CUDA Graphs versus eager execution
+
+Compare the default vLLM configuration with eager execution:
+
+```bash
+# Default configuration: CUDA Graphs are used when supported.
+vllm serve Qwen/Qwen3-0.6B ...
+
+# Eager execution: skip CUDA Graph capture.
+vllm serve Qwen/Qwen3-0.6B --enforce-eager ...
+```
+
+Measure startup time separately from steady-state serving. Use Nsight Systems to inspect:
+
+- CUDA API calls and kernel-launch overhead;
+- the number and grouping of kernel launches;
+- synchronization points;
+- GPU idle intervals;
+- CUDA Graph execution;
+- the cost of compilation, warm-up, and graph capture.
+
+The expected trade-off is faster startup and simpler development behavior with eager execution, versus better steady-state decode efficiency when CUDA Graphs can be reused. The result depends on the model, request shapes, and GPU.
+
+### Nsight Systems: application and engine timeline
+
+Nsight Systems is the first profiler to use because it provides the whole execution timeline. Profile a short, controlled request window rather than an entire long-running server. For vLLM, the current documentation recommends options such as:
+
+```bash
+nsys profile \
+  --trace-fork-before-exec=true \
+  --cuda-graph-trace=node \
+  --capture-range=cudaProfilerApi \
+  --capture-range-end=repeat \
+  vllm serve Qwen/Qwen3-0.6B ...
+```
+
+For multiprocessing, test `VLLM_WORKER_MULTIPROC_METHOD=spawn` as recommended by the vLLM profiling documentation. The CLI must be available in the environment that runs the vLLM process. Save the report to a directory mounted from the container and open it with the host-side Nsight Systems UI.
+
+The first analysis should identify whether time is dominated by:
+
+- Python and HTTP overhead;
+- prompt prefill;
+- autoregressive decode;
+- CUDA launch and synchronization overhead;
+- memory transfers;
+- GPU idle time;
+- batching or queueing;
+- compilation and warm-up.
+
+### Nsight Compute: selected kernel analysis
+
+Nsight Compute should be used on a short, controlled capture of one or a few representative kernels, not to measure production-like server throughput. It can replay or serialize work and can add substantial overhead.
+
+Possible kernels to investigate include:
+
+- GEMM or SGEMM kernels used by linear layers;
+- FlashAttention kernels;
+- normalization kernels;
+- KV-cache update or attention kernels.
+
+The useful metrics are:
+
+- achieved occupancy;
+- register usage;
+- shared-memory usage;
+- DRAM throughput;
+- L2 cache hit rate;
+- SM utilization;
+- warp stall reasons.
+
+These metrics connect the serving workload to the earlier modules:
+
+| Earlier concept | What the profiler can reveal in the vLLM lab |
+| --- | --- |
+| M3: SMs, warps, occupancy | Active warps, achieved occupancy, warp stalls, and latency hiding |
+| M4: locality and memory hierarchy | DRAM traffic, L2 behavior, memory bandwidth, and attention/KV-cache movement |
+| M5: performance measurement | Kernel duration, application timeline, warm-up, steady state, and percentiles |
+| M6: transfers and pinned memory | Host/device copies and whether transfer or staging overhead is visible |
+| M7: configuration and resources | Registers, shared memory, launch shape, CUDA Graph behavior, and resource limits |
+| M8: PyTorch and CUDA runtime | CUDA memory use, streams, synchronization, and runtime API activity |
+
+Pinned memory is relevant mainly to input and output transfers. After the model is loaded, vLLM keeps weights and the KV cache primarily in device memory, so the central optimization questions are normally batching, prefill/decode balance, KV-cache capacity, kernel efficiency, and scheduling.
+
+### Recommended result table
+
+The final exercise should produce a table such as:
+
+| Experiment | Concurrency | Context | Mode | TTFT | TPOT | Throughput | VRAM |
+| --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| Baseline | 1 | 512 | CUDA Graphs | ... | ... | ... | ... |
+| Concurrent workload | 8 | 512 | CUDA Graphs | ... | ... | ... | ... |
+| Long context | 8 | 4096 | CUDA Graphs | ... | ... | ... | ... |
+| Eager execution | 8 | 512 | Eager | ... | ... | ... | ... |
+
+The written conclusion should have the form: the selected configuration improves throughput or latency because it exposes more parallel work, reuses execution graphs, improves batching, or reduces a particular memory or scheduling bottleneck. It should also state the cost, such as higher VRAM use, longer queueing, slower startup, or worse P99 latency.
+
+### Why LangChain is not part of the first lab
+
+The first lab should use the direct OpenAI-compatible client. This keeps the endpoint, request shape, streaming behavior, latency, token counts, and server configuration visible. LangChain can be introduced later for chains, retrieval, tools, or application composition, after the GPU and serving behavior has been measured directly.
