@@ -14,7 +14,6 @@
     "1.5 Moving tensors and models to the GPU",
     "1.6 Difference between CPU computation and GPU computation",
     "1.7 Basic management of GPU memory in PyTorch",
-    "1.8 Practical examples of CUDA usage with PyTorch tensors",
     "2.1 Tensor and device walkthrough",
     "2.2 PyTorch benchmark exercise",
     "2.3 torch.cuda inspection exercise",
