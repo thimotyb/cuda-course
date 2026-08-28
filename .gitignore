@@ -20,6 +20,8 @@
 *.log
 *.tmp
 .venv/
+__pycache__/
+*.py[cod]
 
 # Local extracted text cache from the course book PDF
 /resources/book-extracted/

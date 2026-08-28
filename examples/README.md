@@ -33,6 +33,57 @@ sudo apt update
 sudo apt install build-essential git wget
 ```
 
+## Docker for the M9 vLLM exercise
+
+The CUDA examples in the earlier modules do not require Docker. The M9 vLLM exercise uses Docker to run vLLM and its Python dependencies inside the official `vllm/vllm-openai` image, so vLLM does not need to be installed in the host Python environment.
+
+On Ubuntu, install Docker Engine from Docker's official repository. Do not rely on an unrelated or outdated distribution package when preparing the course environment:
+
+```bash
+sudo apt update
+sudo apt install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Allow the current user to run Docker without `sudo`:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+Log out and log in again, or start a new login session, before testing the group change. Then verify Docker:
+
+```bash
+docker run --rm hello-world
+```
+
+For the vLLM container to use the NVIDIA GPU, install and configure the NVIDIA Container Toolkit after Docker:
+
+```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+  sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
+
+Verify that Docker can access the NVIDIA GPU:
+
+```bash
+docker run --rm --gpus all nvidia/cuda:base-ubuntu22.04 nvidia-smi
+```
+
+The test requires a working NVIDIA driver and a GPU visible to the host. If `nvidia-smi` works on the host but the container test fails, check the NVIDIA Container Toolkit configuration before troubleshooting vLLM.
+
 Installa il CUDA Toolkit dal repository NVIDIA. Scegli prima il repository corretto per la tua versione di Ubuntu dalla pagina ufficiale:
 
 https://developer.nvidia.com/cuda-downloads
@@ -167,3 +218,4 @@ Il wheel `cu130` include le librerie runtime CUDA 13.0 richieste da PyTorch. Ser
 - `ch08/pytorch_cuda_tensors`: introduzione ai tensori PyTorch eseguiti su CUDA, con attributi, placement, operazioni tensoriali, timing CUDA e memoria GPU.
 - `ch08/torch_cuda_overview`: panoramica pratica del package `torch.cuda`, con device discovery, proprieta' GPU, memoria, stream, CUDA events e sincronizzazione.
 - `ch08/pytorch_cuda_memory`: esercizio focalizzato sugli strumenti PyTorch per osservare memoria CUDA allocata, riservata, picchi, cache e memoria libera del device.
+- `ch09/vllm_docker_demo`: prototipo per avviare Qwen3-0.6B in vLLM tramite Docker e inviare una richiesta da Python attraverso l'API OpenAI-compatible.

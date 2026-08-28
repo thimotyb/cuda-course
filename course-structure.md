@@ -37,6 +37,7 @@
 | `https://docs.pytorch.org/docs/2.13/cuda.html` | official docs | `M8` | API reference for `torch.cuda` device inspection, streams, events, synchronization, and memory utilities |
 | `https://docs.pytorch.org/docs/2.13/torch_cuda_memory.html` | official docs | `M8` | Source for PyTorch CUDA memory inspection, snapshots, allocator behavior, and memory debugging concepts |
 | `https://docs.pytorch.org/docs/stable/cuda.html` | official docs | `M8` | `torch.cuda` reference and workflow anchors |
+| `https://docs.vllm.ai/en/latest/getting_started/installation/gpu/index.html` | official docs | `M9` | vLLM installation and GPU environment requirements |
 
 ## Mapping Rules
 
