@@ -15,7 +15,7 @@
     "1.6 Identification of bottlenecks",
     "2.1 Timing exercise",
     "2.2 Bottleneck exercise",
-    "Module aligned 1:1 with the syllabus section on performance metrics, timing methods, transfer analysis, and bottleneck discovery."
+    "Learn how to measure CUDA programs correctly, separate kernel time from transfer and setup costs, and identify the bottleneck before choosing an optimization."
   ],
   "required_images": [],
   "required_links": [

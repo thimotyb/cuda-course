@@ -5,22 +5,29 @@
     "M8 - CUDA and PyTorch",
     "Learning outcomes",
     "Scope",
-    "1. Syllabus Topics",
+    "1. PyTorch CUDA Workflow",
     "2. Guided Exercises",
     "1.1 Introduction to GPU support in PyTorch",
-    "1.2 Using the `torch.cuda` package",
-    "1.3 Verifying GPU availability",
-    "1.4 Moving tensors and models to the GPU",
-    "1.5 Difference between CPU computation and GPU computation",
-    "1.6 Basic management of GPU memory in PyTorch",
-    "1.7 Practical examples of CUDA usage with PyTorch tensors",
-    "2.1 Device exercise",
+    "1.2 Tensors as the unit of GPU work",
+    "1.3 Using the `torch.cuda` package",
+    "1.4 Verifying GPU availability",
+    "1.5 Moving tensors and models to the GPU",
+    "1.6 Difference between CPU computation and GPU computation",
+    "1.7 Basic management of GPU memory in PyTorch",
+    "1.8 Practical examples of CUDA usage with PyTorch tensors",
+    "2.1 Tensor and device walkthrough",
     "2.2 PyTorch benchmark exercise",
-    "Module aligned 1:1 with the syllabus section on GPU usage in PyTorch, `torch.cuda`, tensor movement, and basic memory handling."
+    "2.3 torch.cuda inspection exercise",
+    "2.4 CUDA memory tools exercise",
+    "Learn how PyTorch uses CUDA devices, how tensors and models move onto the GPU, and how to measure runtime and memory behavior without being misled by hidden transfers or asynchronous execution."
   ],
   "required_images": [],
   "required_links": [
     "../index.html",
-    "chapter-07.html"
+    "chapter-07.html",
+    "chapter-09.html",
+    "../../examples/ch08/pytorch_cuda_tensors/README.md",
+    "../../examples/ch08/torch_cuda_overview/README.md",
+    "../../examples/ch08/pytorch_cuda_memory/README.md"
   ]
 }

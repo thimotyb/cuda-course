@@ -17,7 +17,7 @@
     "1.8 Using shared memory to improve performance",
     "2.1 Transfer experiment",
     "2.2 Overlap experiment",
-    "Module aligned 1:1 with the syllabus section on pinned memory, asynchronous transfers, overlap, streams, and reducing global-memory pressure."
+    "Learn how memory movement limits CUDA performance, how pinned memory and asynchronous transfers help, and how streams and shared memory can reduce idle time and global-memory pressure."
   ],
   "required_images": [],
   "required_links": [

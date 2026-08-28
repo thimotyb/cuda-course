@@ -14,7 +14,7 @@
     "1.5 Practical strategies for testing different configurations",
     "2.1 Launch sweep",
     "2.2 Comparative tuning",
-    "Module aligned 1:1 with the syllabus section on block sizing, warp and occupancy relations, resource balance, and configuration sweeps."
+    "Learn how launch configuration affects CUDA performance, how block size interacts with warps and occupancy, and how to tune kernels through measured experiments instead of fixed rules of thumb."
   ],
   "required_images": [],
   "required_links": [

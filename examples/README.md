@@ -137,6 +137,24 @@ Se `ncu` termina con `ERR_NVGPUCTRPERM`, il tool e' installato correttamente ma 
 - Versionare sorgenti e piccoli file di input necessari.
 - Non versionare binari compilati, file oggetto o output temporanei.
 
+## Requisiti per gli esercizi Python/PyTorch
+
+Gli esempi del modulo `ch08` usano Python e PyTorch con supporto CUDA. Per evitare di installare pacchetti Python nel sistema operativo, usa una virtualenv locale del repository:
+
+```bash
+cd /home/thimoty/git/cuda-course
+python3 -m venv .venv
+.venv/bin/python -m pip install torch numpy --index-url https://download.pytorch.org/whl/cu130
+```
+
+Verifica che PyTorch veda CUDA:
+
+```bash
+.venv/bin/python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no cuda')"
+```
+
+Il wheel `cu130` include le librerie runtime CUDA 13.0 richieste da PyTorch. Serve comunque un driver NVIDIA sufficientemente recente e una GPU visibile al sistema.
+
 ## Esempi disponibili
 
 - `ch02/simple_kernel_launch`: lancio minimo di un kernel CUDA.
@@ -146,3 +164,6 @@ Se `ncu` termina con `ERR_NVGPUCTRPERM`, il tool e' installato correttamente ma 
 - `ch04/register_occupancy_tradeoff`: kernel parametrico per confrontare thread per blocco, pressione sui registri, occupancy teorica e tempo di esecuzione.
 - `ch04/tiled_matrix_mul_square`: moltiplicazione di matrici quadrate con tiling e shared memory, senza boundary checks.
 - `ch04/cublas_matrix_mul_compare`: confronto tra triplo `for` CPU, tiled kernel didattico e `cuBLAS SGEMM`.
+- `ch08/pytorch_cuda_tensors`: introduzione ai tensori PyTorch eseguiti su CUDA, con attributi, placement, operazioni tensoriali, timing CUDA e memoria GPU.
+- `ch08/torch_cuda_overview`: panoramica pratica del package `torch.cuda`, con device discovery, proprieta' GPU, memoria, stream, CUDA events e sincronizzazione.
+- `ch08/pytorch_cuda_memory`: esercizio focalizzato sugli strumenti PyTorch per osservare memoria CUDA allocata, riservata, picchi, cache e memoria libera del device.
