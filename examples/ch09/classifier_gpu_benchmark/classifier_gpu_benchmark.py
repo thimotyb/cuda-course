@@ -301,7 +301,7 @@ def run_xgboost(X_train, y_train, X_validation, y_validation, args, device) -> l
             n_estimators=args.xgb_estimators,
             max_depth=args.xgb_max_depth,
             tree_method="hist",
-            device=device_name,
+            device=device_name,  # <-- switch "cpu"/"cuda": this is what moves XGBoost training/inference onto the GPU
             eval_metric="mlogloss",
             random_state=args.seed,
         )
