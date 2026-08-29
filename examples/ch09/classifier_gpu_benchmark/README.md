@@ -102,8 +102,9 @@ Or run one model at a time:
 Useful flags (defaults are sized to finish in a few minutes on a course
 machine):
 
-- `--max-train-rows`, `--max-test-rows` (default `200000` / `50000`, `-1` for
-  the full split) — control dataset size and runtime.
+- `--max-train-rows`, `--max-validation-rows` (default `200000` / `50000`,
+  `-1` for the full split) — control dataset size and runtime. The validation
+  set is never used to fit a model.
 - `--n-estimators`, `--max-depth` — Random Forest tree count and depth. Depth
   is capped deliberately: it bounds the tensor-walk traversal to a fixed
   number of steps (see "How the Random Forest inference works" below).
@@ -127,16 +128,16 @@ operation — CPU and GPU run the exact same code, just on a different device.
 ## Expected behavior
 
 The program prints, for each requested model: a training-time line, an
-inference-time line with accuracy, and (where a GPU is available) the same
-numbers again on `cuda:0` with a speedup ratio. `--model rf` also prints a
-`match_vs_sklearn` rate — the tensor-walk predictions should match
+inference-time line with validation accuracy, and (where a GPU is available)
+the same numbers again on `cuda:0` with a speedup ratio. `--model rf` also
+prints a `match_vs_sklearn` rate — the tensor-walk predictions should match
 scikit-learn's own `.predict()` almost exactly, since both average the same
-per-tree class probabilities. `--model all` finishes with one summary table
-across all three models.
+per-tree class probabilities. `--model all` finishes with a timing summary
+and a separate validation-accuracy comparison across all three models.
 
 ### Numbers observed on the course reference machine
 
-RTX 5060 Ti, default settings (`--max-train-rows 200000 --max-test-rows
+RTX 5060 Ti, default settings (`--max-train-rows 200000 --max-validation-rows
 50000`), `--model all`:
 
 | Model | Phase | Device | Time | Notes |

@@ -49,6 +49,7 @@ cached under `~/scikit_learn_data`.
 from __future__ import annotations
 
 import argparse
+import re
 import time
 from typing import Callable, Optional
 
@@ -94,12 +95,14 @@ def timed(fn: Callable[[], object], device: Optional[torch.device] = None):
     return result, elapsed_ms
 
 
-def load_dataset(max_train_rows: int, max_test_rows: int, seed: int):
+def load_dataset(max_train_rows: int, max_validation_rows: int, seed: int):
     """Load Covertype, split it, and optionally subsample for a faster run.
 
-    max_train_rows / max_test_rows of -1 keep the full split. Subsampling is a
-    plain random draw from the already-stratified split, so class proportions
-    stay close to the full dataset without adding a second stratification pass.
+    The held-out split is used as a validation set: it is never used to fit a
+    model, and its accuracy is the common quality metric for all three models.
+    max_train_rows / max_validation_rows of -1 keep the full split.
+    Subsampling is a plain random draw from the already-stratified split, so
+    class proportions stay close to the full dataset.
     """
     from sklearn.datasets import fetch_covtype
     from sklearn.model_selection import train_test_split
@@ -108,7 +111,7 @@ def load_dataset(max_train_rows: int, max_test_rows: int, seed: int):
     X, y = fetch_covtype(return_X_y=True)
     y = y.astype(np.int64) - 1  # sklearn labels are 1..7; shift to 0..6
 
-    X_train, X_test, y_train, y_test = train_test_split(
+    X_train, X_validation, y_train, y_validation = train_test_split(
         X, y, test_size=0.2, random_state=seed, stratify=y
     )
 
@@ -116,18 +119,18 @@ def load_dataset(max_train_rows: int, max_test_rows: int, seed: int):
     if 0 < max_train_rows < len(X_train):
         idx = rng.choice(len(X_train), size=max_train_rows, replace=False)
         X_train, y_train = X_train[idx], y_train[idx]
-    if 0 < max_test_rows < len(X_test):
-        idx = rng.choice(len(X_test), size=max_test_rows, replace=False)
-        X_test, y_test = X_test[idx], y_test[idx]
+    if 0 < max_validation_rows < len(X_validation):
+        idx = rng.choice(len(X_validation), size=max_validation_rows, replace=False)
+        X_validation, y_validation = X_validation[idx], y_validation[idx]
 
     X_train = X_train.astype(np.float32)
-    X_test = X_test.astype(np.float32)
+    X_validation = X_validation.astype(np.float32)
 
     print(
-        f"  train: {X_train.shape[0]:,} rows, test: {X_test.shape[0]:,} rows, "
+        f"  train: {X_train.shape[0]:,} rows, validation: {X_validation.shape[0]:,} rows, "
         f"features: {X_train.shape[1]}, classes: {len(np.unique(y))}"
     )
-    return X_train, X_test, y_train, y_test
+    return X_train, X_validation, y_train, y_validation
 
 
 # ---------------------------------------------------------------------------
@@ -228,7 +231,7 @@ def predict_forest_tensor(
     return avg_probs.argmax(dim=1)
 
 
-def run_random_forest(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
+def run_random_forest(X_train, y_train, X_validation, y_validation, args, device) -> list[Row]:
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import accuracy_score
 
@@ -247,19 +250,19 @@ def run_random_forest(X_train, y_train, X_test, y_test, args, device) -> list[Ro
     )
     rows.append(("Random Forest", "train", "cpu", train_ms, "scikit-learn, no GPU path"))
 
-    sk_preds, sk_predict_ms = timed(lambda: clf.predict(X_test))
-    sk_acc = accuracy_score(y_test, sk_preds)
-    print(f"  sklearn .predict() (CPU, native, reference):                {sk_predict_ms:9.1f} ms  accuracy={sk_acc:.4f}")
+    sk_preds, sk_predict_ms = timed(lambda: clf.predict(X_validation))
+    sk_acc = accuracy_score(y_validation, sk_preds)
+    print(f"  sklearn .predict() (CPU, native, validation reference):      {sk_predict_ms:9.1f} ms  accuracy={sk_acc:.4f}")
 
     forest = extract_forest_tensors(clf)
 
     for dev in [d for d in (torch.device("cpu"), device) if d is not None]:
         forest_dev = {k: (v.to(dev) if torch.is_tensor(v) else v) for k, v in forest.items()}
-        preds, ms = timed(lambda: predict_forest_tensor(X_test, forest_dev, dev, args.max_depth), dev)
+        preds, ms = timed(lambda: predict_forest_tensor(X_validation, forest_dev, dev, args.max_depth), dev)
         preds_np = preds.cpu().numpy()
         match_rate = float((preds_np == sk_preds).mean())
-        acc = accuracy_score(y_test, preds_np)
-        rows_per_s = len(X_test) / (ms / 1000.0)
+        acc = accuracy_score(y_validation, preds_np)
+        rows_per_s = len(X_validation) / (ms / 1000.0)
         note = f"accuracy={acc:.4f} match_vs_sklearn={match_rate:.4%} throughput={rows_per_s:,.0f} rows/s"
         print(f"  torch tensor-walk predict on {dev.type:<4}:                   {ms:9.1f} ms  {note}")
         rows.append(("Random Forest", "inference", dev.type, ms, note))
@@ -272,7 +275,7 @@ def run_random_forest(X_train, y_train, X_test, y_test, args, device) -> list[Ro
 # ---------------------------------------------------------------------------
 
 
-def run_xgboost(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
+def run_xgboost(X_train, y_train, X_validation, y_validation, args, device) -> list[Row]:
     import warnings
 
     from sklearn.metrics import accuracy_score
@@ -305,8 +308,8 @@ def run_xgboost(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
 
     cpu_clf = make_clf("cpu")
     _, cpu_train_ms = timed(lambda: cpu_clf.fit(X_train, y_train))
-    cpu_preds, cpu_predict_ms = timed(lambda: cpu_clf.predict(X_test))
-    cpu_acc = accuracy_score(y_test, cpu_preds)
+    cpu_preds, cpu_predict_ms = timed(lambda: cpu_clf.predict(X_validation))
+    cpu_acc = accuracy_score(y_validation, cpu_preds)
     print(f"  XGBoost train, hist method (CPU):    {cpu_train_ms:9.1f} ms")
     print(f"  XGBoost predict (CPU):               {cpu_predict_ms:9.1f} ms  accuracy={cpu_acc:.4f}")
     rows.append(("XGBoost", "train", "cpu", cpu_train_ms, "hist tree method"))
@@ -316,7 +319,7 @@ def run_xgboost(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
             "inference",
             "cpu",
             cpu_predict_ms,
-            f"accuracy={cpu_acc:.4f} throughput={len(X_test) / (cpu_predict_ms / 1000.0):,.0f} rows/s",
+            f"accuracy={cpu_acc:.4f} throughput={len(X_validation) / (cpu_predict_ms / 1000.0):,.0f} rows/s",
         )
     )
 
@@ -330,13 +333,13 @@ def run_xgboost(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
         print("  Note: predict() below passes host (CPU) numpy data to a GPU-trained")
         print("  booster, so XGBoost copies it to the device on every call — that copy")
         print("  is included in the GPU predict time below.")
-        gpu_preds, gpu_predict_ms = timed(lambda: gpu_clf.predict(X_test))
+        gpu_preds, gpu_predict_ms = timed(lambda: gpu_clf.predict(X_validation))
     except Exception as exc:  # noqa: BLE001 - genuinely want to catch any backend failure here
         print(f"  XGBoost GPU training/inference is not available in this environment: {exc}")
         print("  Skipping XGBoost GPU columns; the CPU results above still stand.")
         return rows
 
-    gpu_acc = accuracy_score(y_test, gpu_preds)
+    gpu_acc = accuracy_score(y_validation, gpu_preds)
     print(
         f"  XGBoost train, hist method (GPU):    {gpu_train_ms:9.1f} ms  "
         f"speedup={cpu_train_ms / gpu_train_ms:.2f}x"
@@ -352,7 +355,7 @@ def run_xgboost(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
             "inference",
             "cuda",
             gpu_predict_ms,
-            f"accuracy={gpu_acc:.4f} throughput={len(X_test) / (gpu_predict_ms / 1000.0):,.0f} rows/s",
+            f"accuracy={gpu_acc:.4f} throughput={len(X_validation) / (gpu_predict_ms / 1000.0):,.0f} rows/s",
         )
     )
     return rows
@@ -421,13 +424,13 @@ def evaluate_mlp(model, device, X, y_np, batch_size):
     return acc, infer_ms
 
 
-def run_mlp(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
+def run_mlp(X_train, y_train, X_validation, y_validation, args, device) -> list[Row]:
     n_features = X_train.shape[1]
     n_classes = int(y_train.max()) + 1
 
     X_train_t = torch.from_numpy(X_train).float()
     y_train_t = torch.from_numpy(y_train).long()
-    X_test_t = torch.from_numpy(X_test).float()
+    X_validation_t = torch.from_numpy(X_validation).float()
 
     rows: list[Row] = []
     train_ms_by_device = {}
@@ -438,7 +441,7 @@ def run_mlp(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
         X_dev = X_train_t.to(dev)
         y_dev = y_train_t.to(dev)
         model, train_ms = train_mlp(dev, X_dev, y_dev, n_features, n_classes, args.epochs, args.mlp_batch_size, args.seed)
-        acc, infer_ms = evaluate_mlp(model, dev, X_test_t.to(dev), y_test, args.mlp_batch_size)
+        acc, infer_ms = evaluate_mlp(model, dev, X_validation_t.to(dev), y_validation, args.mlp_batch_size)
         train_ms_by_device[dev.type] = train_ms
         print(f"  MLP train on {dev.type:<4} ({args.epochs} epochs):            {train_ms:9.1f} ms")
         print(f"  MLP inference on {dev.type:<4}:                         {infer_ms:9.1f} ms  accuracy={acc:.4f}")
@@ -449,7 +452,7 @@ def run_mlp(X_train, y_train, X_test, y_test, args, device) -> list[Row]:
                 "inference",
                 dev.type,
                 infer_ms,
-                f"accuracy={acc:.4f} throughput={len(X_test) / (infer_ms / 1000.0):,.0f} rows/s",
+                f"accuracy={acc:.4f} throughput={len(X_validation) / (infer_ms / 1000.0):,.0f} rows/s",
             )
         )
 
@@ -472,6 +475,19 @@ def print_summary(rows: list[Row]) -> None:
         print(f"{model:<14}{phase:<11}{dev:<7}{ms:12.1f}   {note}")
 
 
+def print_accuracy_summary(rows: list[Row]) -> None:
+    """Print validation accuracy in a compact model-comparison table."""
+    print("\n=== Validation accuracy comparison ===")
+    print(f"{'Model':<14}{'Device':<8}{'Accuracy':>10}")
+    print("-" * 34)
+    for model, phase, dev, _ms, note in rows:
+        if phase != "inference":
+            continue
+        match = re.search(r"accuracy=([0-9.]+)", note)
+        if match:
+            print(f"{model:<14}{dev:<8}{float(match.group(1)):10.4f}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Compare Random Forest, XGBoost, and an MLP classifier on CPU vs GPU."
@@ -492,7 +508,10 @@ def main() -> None:
         "--max-train-rows", type=int, default=200_000, help="-1 to use the full training split."
     )
     parser.add_argument(
-        "--max-test-rows", type=int, default=50_000, help="-1 to use the full test split."
+        "--max-validation-rows",
+        type=int,
+        default=50_000,
+        help="validation rows used for timing and accuracy; -1 keeps the full validation split.",
     )
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
@@ -503,21 +522,24 @@ def main() -> None:
     else:
         print("CUDA available: False — running CPU-only, GPU columns will be skipped.")
 
-    X_train, X_test, y_train, y_test = load_dataset(args.max_train_rows, args.max_test_rows, args.seed)
+    X_train, X_validation, y_train, y_validation = load_dataset(
+        args.max_train_rows, args.max_validation_rows, args.seed
+    )
 
     all_rows: list[Row] = []
     if args.model in ("rf", "all"):
         print("\n=== Random Forest (scikit-learn train, PyTorch tensor-walk inference) ===")
-        all_rows += run_random_forest(X_train, y_train, X_test, y_test, args, device)
+        all_rows += run_random_forest(X_train, y_train, X_validation, y_validation, args, device)
     if args.model in ("xgboost", "all"):
         print("\n=== XGBoost (gradient boosted trees, hist split method) ===")
-        all_rows += run_xgboost(X_train, y_train, X_test, y_test, args, device)
+        all_rows += run_xgboost(X_train, y_train, X_validation, y_validation, args, device)
     if args.model in ("mlp", "all"):
         print("\n=== MLP (pure PyTorch) ===")
-        all_rows += run_mlp(X_train, y_train, X_test, y_test, args, device)
+        all_rows += run_mlp(X_train, y_train, X_validation, y_validation, args, device)
 
     if args.model == "all":
         print_summary(all_rows)
+        print_accuracy_summary(all_rows)
 
 
 if __name__ == "__main__":
