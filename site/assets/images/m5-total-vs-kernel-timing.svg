@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">End-to-end timing compared with kernel timing</title>
+  <desc id="desc">A timeline showing host preparation, allocation, transfers, kernel launch, GPU kernel execution, synchronization, result transfer and validation. The CPU timer covers the whole path, while CUDA events cover only kernel execution.</desc>
+  <rect width="1200" height="560" fill="#ffffff"/>
+  <style>
+    .title { font: 700 26px Arial, sans-serif; fill: #111827; }
+    .label { font: 700 18px Arial, sans-serif; fill: #111827; }
+    .text { font: 16px Arial, sans-serif; fill: #374151; }
+    .small { font: 14px Arial, sans-serif; fill: #4b5563; }
+    .host { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+    .gpu { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; }
+    .boundary { stroke: #111827; stroke-width: 3; }
+    .cpu-line { stroke: #1d4ed8; stroke-width: 5; }
+    .event-line { stroke: #15803d; stroke-width: 5; }
+    .arrow { fill: #111827; }
+  </style>
+
+  <text x="40" y="48" class="title">Separating end-to-end time from kernel time</text>
+  <text x="40" y="78" class="text">The measured interval must match the performance question.</text>
+
+  <text x="40" y="145" class="label">Execution path</text>
+  <rect x="210" y="112" width="145" height="66" rx="6" class="host"/>
+  <rect x="375" y="112" width="145" height="66" rx="6" class="host"/>
+  <rect x="540" y="112" width="145" height="66" rx="6" class="host"/>
+  <rect x="705" y="112" width="145" height="66" rx="6" class="gpu"/>
+  <rect x="870" y="112" width="145" height="66" rx="6" class="host"/>
+  <rect x="1035" y="112" width="125" height="66" rx="6" class="host"/>
+  <text x="282" y="140" text-anchor="middle" class="text">Host input</text>
+  <text x="282" y="162" text-anchor="middle" class="text">preparation</text>
+  <text x="447" y="140" text-anchor="middle" class="text">Allocation</text>
+  <text x="447" y="162" text-anchor="middle" class="text">and copies</text>
+  <text x="612" y="140" text-anchor="middle" class="text">Kernel</text>
+  <text x="612" y="162" text-anchor="middle" class="text">launch</text>
+  <text x="777" y="140" text-anchor="middle" class="text">GPU kernel</text>
+  <text x="777" y="162" text-anchor="middle" class="text">execution</text>
+  <text x="942" y="140" text-anchor="middle" class="text">Synchronize</text>
+  <text x="942" y="162" text-anchor="middle" class="text">and copy back</text>
+  <text x="1097" y="140" text-anchor="middle" class="text">Validate</text>
+  <text x="1097" y="162" text-anchor="middle" class="text">result</text>
+  <path d="M355 145h18m127 0h18m127 0h18m127 0h18m127 0h18" stroke="#6b7280" stroke-width="2"/>
+  <path d="m370 139 8 6-8 6m165-6 8 6-8 6m165-6 8 6-8 6m165-6 8 6-8 6m165-6 8 6-8 6" class="arrow"/>
+
+  <line x1="210" y1="220" x2="1160" y2="220" class="cpu-line"/>
+  <path d="m210 212 0 16m950-16 0 16" class="boundary"/>
+  <text x="685" y="212" text-anchor="middle" class="label" fill="#1d4ed8">CPU wall-clock timer: end-to-end latency</text>
+  <text x="210" y="255" class="small">start</text>
+  <text x="1160" y="255" text-anchor="end" class="small">stop</text>
+  <text x="685" y="280" text-anchor="middle" class="small">Includes host work, launch overhead, synchronization, and transfers inside the boundaries.</text>
+
+  <line x1="685" y1="350" x2="850" y2="350" class="event-line"/>
+  <path d="m685 342 0 16m165-16 0 16" class="boundary"/>
+  <text x="767" y="342" text-anchor="middle" class="label" fill="#15803d">CUDA events: GPU interval</text>
+  <text x="685" y="385" class="small">event start</text>
+  <text x="850" y="385" text-anchor="end" class="small">event stop</text>
+  <text x="767" y="410" text-anchor="middle" class="small">Measures work reached by the same CUDA stream.</text>
+
+  <rect x="40" y="455" width="1120" height="62" rx="6" fill="#f3f4f6" stroke="#d1d5db"/>
+  <text x="60" y="482" class="label">Rule:</text>
+  <text x="125" y="482" class="text">always report the timing boundary: kernel time, transfer time, or end-to-end latency.</text>
+  <text x="60" y="505" class="small">A result called only “execution time” is ambiguous unless its start and stop points are explicit.</text>
+</svg>
