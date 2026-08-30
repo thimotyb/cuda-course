@@ -41,6 +41,8 @@
         <article class="subtopic"><h3>1.8 Streaming Multiprocessor</h3><p>An SM is the GPU execution unit that schedules warps and provides execution lanes, registers, shared memory, and other local resources.</p></article>
         <article class="subtopic"><h3>1.9 Occupancy</h3><p>A measure of how many warps are resident on an SM compared with the maximum possible. Higher occupancy can help hide latency, but it is not the same thing as performance.</p></article>
         <article class="subtopic"><h3>1.10 Divergence</h3><p>A situation where threads in the same warp take different control-flow paths. The hardware may need to execute paths separately, reducing useful parallel work.</p></article>
+        <article class="subtopic"><h3>1.11 SIMD</h3><p>Single Instruction, Multiple Data. A SIMD execution model applies one instruction to multiple data elements at the same time using vector lanes. The programmer typically thinks in terms of vector operations whose lanes follow the same instruction stream.</p></article>
+        <article class="subtopic"><h3>1.12 SIMT</h3><p>Single Instruction, Multiple Threads. CUDA uses a SIMT model: many independent threads execute the same kernel and are scheduled in groups called warps. Threads have their own registers and logical control flow, but threads in one warp share instruction execution, so divergent branches can reduce efficiency. SIMT combines the programming model of independent threads with hardware execution that resembles SIMD at the warp level.</p></article>
       </section>
       <section class="panel">
         <h2>2. Memory and Data Movement</h2>

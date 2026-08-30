@@ -14,9 +14,20 @@ nvcc memory_bandwidth_measurement.cu -O3 -lineinfo -o memory_bandwidth_measureme
 
 The output reports:
 
+- the detected GPU memory clock and bus width;
+- theoretical peak bandwidth calculated from those properties;
 - kernel time measured on the GPU timeline;
 - useful traffic: one read and one write of one `float` per element;
-- effective bandwidth in decimal `GB/s`.
+- effective bandwidth in decimal `GB/s`;
+- the percentage of theoretical bandwidth reached by this kernel.
+
+The program calculates the theoretical value at runtime:
+
+```text
+memory clock rate * (memory bus width / 8) * 2 / 10^9
+```
+
+On the reference RTX 5060 Ti, this is approximately `448 GB/s`. The effective value is normally lower because it depends on the specific kernel, workload, runtime overhead, and memory behavior.
 
 ## Nsight Systems
 
@@ -49,4 +60,3 @@ Start with `Launch Statistics`, `GPU Speed Of Light Throughput`, and `Memory Wor
 - Does the Nsight Systems timeline show the warm-up separately from measured launches?
 - Which time belongs to the kernel, and which time belongs to host-side orchestration?
 - How does the effective bandwidth change when the number of elements increases?
-
