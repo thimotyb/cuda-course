@@ -92,7 +92,7 @@ pre {
 }
 
 .shell {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(1280px, calc(100% - 2rem));
   margin: 0 auto;
 }
 
@@ -456,6 +456,20 @@ body {
   border-collapse: collapse;
   font-size: 0.92rem;
   line-height: 1.45;
+}
+
+.vllm-cuda-map {
+  min-width: 1080px;
+}
+
+.vllm-cuda-map th:first-child,
+.vllm-cuda-map td:first-child {
+  width: 32%;
+}
+
+.vllm-cuda-map th:nth-child(2),
+.vllm-cuda-map td:nth-child(2) {
+  width: 68%;
 }
 
 .data-table th,
