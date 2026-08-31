@@ -42,6 +42,25 @@ The token is only needed for gated or private models. `VLLM_WSL2_ENABLE_PIN_MEMO
 The script waits for `http://localhost:8001/health` before returning. Model download and server startup can take time on the first run.
 After changing scheduler settings, wait until the launcher prints `vLLM is ready.` before running the client. vLLM may spend extra time compiling kernels, autotuning, and capturing CUDA graphs after a restart.
 
+## Use a web console
+
+Open WebUI provides a browser-based chat interface for the OpenAI-compatible vLLM endpoint. Start vLLM first, then launch Open WebUI from the repository root:
+
+```bash
+bash examples/ch09/vllm_docker_demo/start_vllm.sh
+bash examples/ch09/vllm_docker_demo/start_open_webui.sh
+```
+
+The console is available at [http://localhost:3000](http://localhost:3000). The launcher connects Open WebUI to the vLLM endpoint at `http://host.docker.internal:8001/v1`, so it works with the default port used by this demo on Linux and Docker Desktop. The first visit asks you to create a local Open WebUI account; the account and chat history are stored in the persistent Docker volume `m9-open-webui-data`.
+
+Stop the web console without stopping vLLM with:
+
+```bash
+bash examples/ch09/vllm_docker_demo/stop_open_webui.sh
+```
+
+Open WebUI is only a frontend: prompts sent from the browser still pass through the same vLLM server, scheduler, KV cache, and GPU that the Python client exercises.
+
 ## Send an inference request
 
 In a second terminal:
