@@ -39,6 +39,13 @@ bash examples/ch09/vllm_docker_demo/start_vllm.sh
 
 The token is only needed for gated or private models. `VLLM_WSL2_ENABLE_PIN_MEMORY=1` enables vLLM's WSL2 pinned-memory path explicitly. The script also applies this value by default. It mounts the Hugging Face cache, exposes port 8001, enables all visible GPUs, limits each request to a 4096-token maximum sequence length, and reserves 80% of GPU memory for vLLM.
 
+The launcher enables Qwen3 tool calling with `--enable-auto-tool-choice --tool-call-parser hermes`. This is needed by Open WebUI because it can send `tool_choice="auto"`, even for an ordinary chat prompt. If you change `MODEL` to a model that needs another parser, override it with `TOOL_CALL_PARSER=...`; check the vLLM tool-calling documentation for the supported parser. After changing this setting, recreate the vLLM container:
+
+```bash
+bash examples/ch09/vllm_docker_demo/stop_vllm.sh
+bash examples/ch09/vllm_docker_demo/start_vllm.sh
+```
+
 The script waits for `http://localhost:8001/health` before returning. Model download and server startup can take time on the first run.
 After changing scheduler settings, wait until the launcher prints `vLLM is ready.` before running the client. vLLM may spend extra time compiling kernels, autotuning, and capturing CUDA graphs after a restart.
 

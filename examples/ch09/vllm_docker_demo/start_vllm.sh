@@ -13,6 +13,7 @@ MAX_NUM_BATCHED_TOKENS="${MAX_NUM_BATCHED_TOKENS:-}"
 HF_CACHE_DIR="${HF_CACHE_DIR:-$HOME/.cache/huggingface}"
 REPORT_DIR="${REPORT_DIR:-$REPO_ROOT/reports/m9/vllm}"
 VLLM_WSL2_ENABLE_PIN_MEMORY="${VLLM_WSL2_ENABLE_PIN_MEMORY:-1}"
+TOOL_CALL_PARSER="${TOOL_CALL_PARSER:-hermes}"
 
 if ! docker info >/dev/null 2>&1; then
   echo "Docker is not reachable. Check Docker Desktop or the Docker socket permissions." >&2
@@ -50,6 +51,8 @@ docker_args+=(
   --max-model-len "$MAX_MODEL_LEN"
   --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION"
   --profiler-config '{"profiler":"torch","torch_profiler_dir":"/reports","torch_profiler_record_shapes":true,"torch_profiler_with_memory":true,"torch_profiler_use_gzip":true,"ignore_frontend":true}'
+  --enable-auto-tool-choice
+  --tool-call-parser "$TOOL_CALL_PARSER"
 )
 
 if [[ -n "$MAX_NUM_SEQS" ]]; then
