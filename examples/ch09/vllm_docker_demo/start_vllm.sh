@@ -8,6 +8,8 @@ MODEL="${MODEL:-Qwen/Qwen3-0.6B}"
 PORT="${PORT:-8001}"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-4096}"
 GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.80}"
+MAX_NUM_SEQS="${MAX_NUM_SEQS:-}"
+MAX_NUM_BATCHED_TOKENS="${MAX_NUM_BATCHED_TOKENS:-}"
 HF_CACHE_DIR="${HF_CACHE_DIR:-$HOME/.cache/huggingface}"
 REPORT_DIR="${REPORT_DIR:-$REPO_ROOT/reports/m9/vllm}"
 VLLM_WSL2_ENABLE_PIN_MEMORY="${VLLM_WSL2_ENABLE_PIN_MEMORY:-1}"
@@ -49,6 +51,14 @@ docker_args+=(
   --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION"
   --profiler-config '{"profiler":"torch","torch_profiler_dir":"/reports","torch_profiler_record_shapes":true,"torch_profiler_with_memory":true,"torch_profiler_use_gzip":true,"ignore_frontend":true}'
 )
+
+if [[ -n "$MAX_NUM_SEQS" ]]; then
+  docker_args+=(--max-num-seqs "$MAX_NUM_SEQS")
+fi
+
+if [[ -n "$MAX_NUM_BATCHED_TOKENS" ]]; then
+  docker_args+=(--max-num-batched-tokens "$MAX_NUM_BATCHED_TOKENS")
+fi
 
 echo "Starting vLLM container '$CONTAINER_NAME' with model '$MODEL'..."
 container_id="$(docker "${docker_args[@]}")"

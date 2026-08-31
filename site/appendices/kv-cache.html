@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appendix - Queries, Keys, Values, Prefill, and Decode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body id="top" data-page-lang="en">
+  <div id="google_translate_element" class="translate-host" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="shell">
+      <section class="hero">
+        <p><a href="../index.html">Home</a> / <a href="../chapters/chapter-09.html">M9</a></p>
+        <h1>Appendix - Queries, Keys, Values, Prefill, and Decode</h1>
+        <p class="hero-copy">A slower explanation of the attention mechanism behind the KV cache used during transformer inference.</p>
+      </section>
+    </div>
+  </header>
+  <main class="shell module-layout">
+    <aside class="panel outline-panel" aria-label="Appendix outline"><nav id="outline-nav"></nav></aside>
+    <article class="module-main">
+      <section class="panel"><nav class="module-nav" aria-label="Appendix navigation"><a href="../chapters/chapter-09.html">Back to M9</a><span>KV Cache Appendix</span></nav></section>
+
+      <section class="panel">
+        <h2>1. The Mental Model</h2>
+        <article class="subtopic"><h3>1.1 Query, Key, and Value</h3><p>In self-attention, every token is projected into three different vectors. The <strong>query</strong> represents what the current token is looking for. The <strong>key</strong> represents how a token can be matched by other tokens. The <strong>value</strong> carries the information that will be mixed into the output if that token receives attention.</p><pre class="code-listing"><code>Query = what am I looking for?
+Key   = how can I be found?
+Value = what information do I provide?</code></pre><p>The model compares a query with keys to decide where to look. Then it uses the resulting attention weights to combine values.</p><pre class="code-listing"><code>Query + Keys -> attention weights -> weighted sum of Values</code></pre></article>
+
+        <article class="subtopic"><h3>1.2 Similarity to vector search</h3><p>The idea is close to retrieval with embeddings. In a vector database, a question embedding is compared with stored chunk embeddings to decide which chunks are relevant. In self-attention, the query vector of the current token is compared with key vectors from previous tokens to decide which previous token states are relevant.</p><div class="table-scroll"><table class="data-table"><thead><tr><th>Vector search or RAG</th><th>Self-attention</th></tr></thead><tbody><tr><td>Question embedding</td><td>Query vector</td></tr><tr><td>Stored chunk embeddings</td><td>Key vectors</td></tr><tr><td>Retrieved text chunks</td><td>Value vectors mixed into the hidden state</td></tr><tr><td>External database lookup</td><td>Internal operation inside every transformer layer and attention head</td></tr></tbody></table></div><p>The analogy is useful, but it is not exact. Self-attention does not retrieve documents. It combines internal token representations inside the model.</p></article>
+      </section>
+
+      <section class="panel">
+        <h2>2. Prefill</h2>
+        <article class="subtopic"><h3>2.1 Processing the prompt</h3><p>Prefill is the phase where the model reads the whole input prompt. If the prompt is:</p><pre class="code-listing"><code>CUDA uses the GPU for</code></pre><p>the model processes all prompt tokens and computes attention state for them. During this phase, it computes keys and values for the prompt tokens and stores them in the KV cache.</p><pre class="code-listing"><code>K/V(CUDA)
+K/V(uses)
+K/V(the)
+K/V(GPU)
+K/V(for)</code></pre><p>Prefill usually has larger matrix operations because the prompt contains several tokens that can be processed together. On the GPU, this often appears as larger GEMM and attention kernels.</p></article>
+
+        <article class="subtopic"><h3>2.2 First output token</h3><p>After prefill, the model has enough state to predict the first generated token. For example, it may produce:</p><pre class="code-listing"><code>computing</code></pre><p>At this point, the prompt's keys and values are already cached. That cache is useful, but generation is not finished: the model must now continue from the token it just produced.</p></article>
+      </section>
+
+      <section class="panel">
+        <h2>3. Decode</h2>
+        <article class="subtopic"><h3>3.1 The new query</h3><p>Decode is the phase where the model generates one new token at a time. The "new query" is the query vector computed from the most recently generated token, not from the original prompt.</p><p>If prefill produced:</p><pre class="code-listing"><code>computing</code></pre><p>then the next decode step computes new attention vectors for that token:</p><pre class="code-listing"><code>Q(computing)
+K(computing)
+V(computing)</code></pre><p>The new query <code>Q(computing)</code> is compared with the cached keys from the prompt and with the new key for <code>computing</code>. The model then uses the matching values to predict the next token.</p><pre class="code-listing"><code>Q(computing) compared with:
+K(CUDA), K(uses), K(the), K(GPU), K(for), K(computing)</code></pre></article>
+
+        <article class="subtopic"><h3>3.2 Cache growth during generation</h3><p>After the model generates another token, for example:</p><pre class="code-listing"><code>workloads</code></pre><p>the following decode step computes:</p><pre class="code-listing"><code>Q(workloads)
+K(workloads)
+V(workloads)</code></pre><p>The KV cache now contains prompt tokens and generated tokens. It grows as the answer grows.</p><pre class="code-listing"><code>Prompt cache:
+K/V(CUDA), K/V(uses), K/V(the), K/V(GPU), K/V(for)
+
+After decode:
+K/V(CUDA), K/V(uses), K/V(the), K/V(GPU), K/V(for), K/V(computing), K/V(workloads)</code></pre></article>
+
+        <figure class="module-figure" data-zoomable><img src="../assets/images/m9-kv-cache-prefill-decode.webp" alt="Diagram comparing attention computation with KV caching during prefill and decode. Prefill computes full query, key, and value tensors and stores K and V in cache memory; decode restores cached K and V and computes attention for one new query token."><figcaption>Figure A.1: Prefill computes and caches K and V for the initial prompt. Decode restores those cached tensors, adds K and V for the newest token, and computes attention using the new query.</figcaption></figure>
+      </section>
+
+      <section class="panel">
+        <h2>4. Why It Is Called KV Cache</h2>
+        <article class="subtopic"><h3>4.1 What is reused</h3><p>The cache stores keys and values because old keys and values remain useful for future decode steps. The query is different at every step because it comes from the current token.</p><pre class="code-listing"><code>Reusable from previous tokens: K and V
+New at each decode step:      Q</code></pre><p>This is why the optimization is called a KV cache, not a QKV cache.</p></article>
+
+        <article class="subtopic"><h3>4.2 Performance consequence</h3><p>Without a KV cache, the model would repeatedly recompute key and value state for the whole prefix every time it generates a token. With the cache, it avoids that repeated compute. The trade-off is memory: cached K and V tensors occupy GPU memory for every layer, attention head, token, and active sequence.</p><pre class="code-listing"><code>More context or more concurrent requests
+-> more cached K/V tensors
+-> more GPU memory use
+-> more KV-cache reads during decode</code></pre><p>This is why vLLM tuning connects directly to CUDA memory behavior. Larger batches can improve GPU utilization, but larger or longer active sequences also increase KV-cache pressure.</p></article>
+      </section>
+
+      <section class="panel">
+        <h2>5. What To Look For In Perfetto</h2>
+        <article class="subtopic"><h3>5.1 Timeline shape</h3><p>In a trace, prefill often appears as a smaller number of larger execution ranges because the prompt is processed as a chunk. Decode appears as many repeated ranges because generation advances one token at a time.</p><pre class="code-listing"><code>Prefill: prompt tokens processed together
+Decode:  token 1, token 2, token 3, ...</code></pre><p>For decode-heavy workloads, the GPU may spend substantial time reading model weights and KV-cache data. That can make the workload memory-bound even when each single decode step is not mathematically large.</p></article>
+      </section>
+    </article>
+  </main>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

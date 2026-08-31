@@ -5,21 +5,23 @@
     "M7 - CUDA Configuration Optimization",
     "Learning outcomes",
     "Scope",
-    "1. Syllabus Topics",
-    "2. Guided Exercises",
-    "1.1 Choosing block dimensions",
-    "1.2 Relationship among threads, blocks, warps, and occupancy",
-    "1.3 Balancing registers, shared memory, and active threads",
-    "1.4 Effects of kernel configuration on performance",
-    "1.5 Practical strategies for testing different configurations",
-    "2.1 Launch sweep",
-    "2.2 Comparative tuning",
+    "1. Configuration and Launch Topics",
+    "1.1 Keeping the GPU supplied with work",
+    "1.2 Choosing a block size and occupancy",
+    "1.3 Balancing registers and shared memory",
+    "1.4 Concurrent kernels and independent work",
+    "1.5 A measured configuration workflow",
     "Learn how launch configuration affects CUDA performance, how block size interacts with warps and occupancy, and how to tune kernels through measured experiments instead of fixed rules of thumb."
   ],
   "required_images": [],
   "required_links": [
     "../index.html",
     "chapter-06.html",
-    "chapter-08.html"
+    "chapter-08.html",
+    "chapter-03.html#top",
+    "chapter-04.html#top",
+    "../../examples/ch06/async_overlap/README.md",
+    "chapter-05.html#top",
+    "chapter-06.html#top"
   ]
 }

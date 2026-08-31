@@ -239,9 +239,19 @@ def check_local_links(html: str, module_file: Path) -> list[str]:
             continue
         if href.startswith("//"):
             continue
-        target = (module_file.parent / href).resolve()
+        path_part, sep, fragment = href.partition("#")
+        target = (module_file.parent / path_part).resolve()
         if not target.exists():
             issues.append(f"Broken local link: {href}")
+            continue
+        if sep and fragment:
+            target_html = target.read_text(encoding="utf-8", errors="ignore")
+            anchor_re = re.compile(
+                rf"\b(?:id|name)=['\"]{re.escape(fragment)}['\"]",
+                flags=re.IGNORECASE,
+            )
+            if not anchor_re.search(target_html):
+                issues.append(f"Broken local anchor: {href}")
     return issues
 
 

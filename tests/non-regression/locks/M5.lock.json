@@ -5,22 +5,36 @@
     "M5 - Performance Measurement",
     "Learning outcomes",
     "Scope",
-    "1. Syllabus Topics",
+    "1. Performance Metrics, Timing, and Bottleneck Analysis",
     "2. Guided Exercises",
-    "1.1 Main metrics for performance evaluation",
-    "1.2 Measuring time on the CPU side",
-    "1.3 Using CUDA timers on the GPU side",
-    "1.4 Difference between total execution time and actual kernel time",
-    "1.5 Analysis of host-device transfers",
-    "1.6 Identification of bottlenecks",
+    "1.1 Performance metrics and bottleneck diagnosis",
+    "1.2 Using CPU timers with asynchronous CUDA work",
+    "1.3 Using CUDA GPU Timers",
+    "1.4 Separating total execution time from kernel time",
+    "1.5 Identifying a memory-bandwidth bottleneck",
     "2.1 Timing exercise",
-    "2.2 Bottleneck exercise",
+    "2.2 Measuring memory movement",
     "Learn how to measure CUDA programs correctly, separate kernel time from transfer and setup costs, and identify the bottleneck before choosing an optimization."
   ],
-  "required_images": [],
+  "required_images": [
+    "../assets/images/m5-total-vs-kernel-timing.svg",
+    "../assets/images/m5-memory-bandwidth-nsys.png",
+    "../assets/images/m5-memory-bandwidth-ncu.png"
+  ],
   "required_links": [
     "../index.html",
     "chapter-04.html",
-    "chapter-06.html"
+    "chapter-06.html",
+    "../../examples/ch05/cuda_cpu_timers/README.md",
+    "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#using-cpu-timers",
+    "../../examples/ch05/cuda_gpu_timers/README.md",
+    "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#using-cuda-gpu-timers",
+    "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#bandwidth",
+    "../../examples/ch05/memory_bandwidth_measurement/README.md",
+    "../../examples/ch05/memory_bandwidth_measurement/memory_bandwidth_measurement.cu",
+    "../../examples/ch05/cuda_cpu_timers/cuda_cpu_timers.cu",
+    "../../examples/ch05/cuda_cpu_timers/cuda_cpu_timers.py",
+    "../../examples/ch05/cuda_gpu_timers/cuda_gpu_timers.cu",
+    "../../examples/ch05/cuda_gpu_timers/cuda_gpu_timers.py"
   ]
 }
