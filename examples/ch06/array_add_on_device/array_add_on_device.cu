@@ -13,20 +13,35 @@
  *  Run with:
  *     ./a.out
  * 
- *  Check the performance of the two kernels with:
- *      nvprof ./a.out  
+ *  Check the memory behavior of the two kernels with:
+ *      ncu --set full ./array_add_on_device 4096 4096 16 16
  * 
 /*/
 
 #include <cstdio>
+#include <cstdlib>
 
+// Row-major flattening: consecutive col (j) values map to consecutive
+// addresses (stride 1), while consecutive row (i) values are LDA elements
+// apart (stride LDA). Whichever logical index we tie to the fastest-varying
+// thread dimension therefore controls whether a warp's accesses land on
+// contiguous addresses or on addresses LDA apart.
 #define IDX(row, col, LDA) ((row) * (LDA) + (col))
 
 // computes c(i,j) = a(i,j) + b(i,j)
 // In this case i is the fastest changing thread dimension
+//
+// Within a warp, threadIdx.x is what actually varies fastest across the 32
+// consecutive threads (threadIdx.y stays fixed for many of them). Here i is
+// derived from threadIdx.x, so consecutive threads in a warp get consecutive
+// i values with the *same* j. Since idx = i * M + j, that means consecutive
+// threads compute idx values M apart -- a strided access pattern. The GPU
+// cannot merge these into one wide memory transaction, so each thread's
+// load/store to a/b/c effectively needs its own transaction: uncoalesced,
+// memory-bandwidth-inefficient access.
 __global__ void add_v1(int *a, int *b, int *c, int N, int M)
 {
-    
+
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     if (i < N && j < M)
@@ -38,6 +53,13 @@ __global__ void add_v1(int *a, int *b, int *c, int N, int M)
 
 // computes c(i,j) = a(i,j) + b(i,j)
 // In this case j is the fastest changing thread dimension
+//
+// Here j (the column, the contiguous dimension per IDX above) is derived
+// from threadIdx.x instead. Consecutive threads in a warp now get
+// consecutive j values with the same i, so idx = i * M + j increases by 1
+// per thread -- consecutive addresses. The GPU can coalesce these into a
+// single wide memory transaction per warp, so this version does the exact
+// same math as add_v1 but with far more efficient global memory traffic.
 __global__ void add_v2(int *a, int *b, int *c, int N, int M)
 {
     int i = blockIdx.y * blockDim.y + threadIdx.y;
@@ -74,10 +96,14 @@ int main(int argc, char *argv[])
     add_v1<<<blocks, threads>>>(a, b, c, n, m);
     add_v2<<<blocks, threads>>>(a, b, c, n, m);
 
+    // Wait for both kernels to finish *before* freeing the memory they use.
+    // cudaFree used to be called first here, which could release a, b, c
+    // while the kernels were still (potentially) running against them.
+    cudaDeviceSynchronize();
+
     cudaFree(a);
     cudaFree(b);
     cudaFree(c);
 
-    cudaDeviceSynchronize();
     return 0;
 }

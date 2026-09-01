@@ -215,6 +215,10 @@ Il wheel `cu130` include le librerie runtime CUDA 13.0 richieste da PyTorch. Ser
 - `ch04/register_occupancy_tradeoff`: kernel parametrico per confrontare thread per blocco, pressione sui registri, occupancy teorica e tempo di esecuzione.
 - `ch04/tiled_matrix_mul_square`: moltiplicazione di matrici quadrate con tiling e shared memory, senza boundary checks.
 - `ch04/cublas_matrix_mul_compare`: confronto tra triplo `for` CPU, tiled kernel didattico e `cuBLAS SGEMM`.
+- `ch06/array_add_on_device`: confronto tra due mappature 2D di una somma di array per osservare accessi coalesced e strided.
+- `ch06/bandwidth_bottleneck`: confronto mirato tra copy coalesced e strided per misurare il bandwidth utile e il traffico globale effettivo.
+- `ch06/l2_cache`: misura del riuso in L2 con accessi normali, streaming e persisting.
+- `ch06/async_overlap`: pipeline copy-kernel-copy con pinned memory e stream CUDA per osservare overlap asincrono.
 - `ch08/pytorch_cuda_tensors`: introduzione ai tensori PyTorch eseguiti su CUDA, con attributi, placement, operazioni tensoriali, timing CUDA e memoria GPU.
 - `ch08/torch_cuda_overview`: panoramica pratica del package `torch.cuda`, con device discovery, proprieta' GPU, memoria, stream, CUDA events e sincronizzazione.
 - `ch08/pytorch_cuda_memory`: esercizio focalizzato sugli strumenti PyTorch per osservare memoria CUDA allocata, riservata, picchi, cache e memoria libera del device.
