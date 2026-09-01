@@ -13,6 +13,21 @@
  *  fastest across the 32 threads of a warp. So whichever index (i or j) is
  *  tied to threadIdx.x decides whether a warp's memory accesses are
  *  contiguous or scattered:
+ *
+ *  Why is it always threadIdx.x that varies fastest? Not because x is
+ *  special -- it is a fixed convention of the CUDA programming model for how
+ *  a (possibly 3D) thread block is linearized into the single ordering used
+ *  to form warps:
+ *      linear_id = threadIdx.z * (blockDim.y * blockDim.x)
+ *                + threadIdx.y * blockDim.x
+ *                + threadIdx.x
+ *  This is a mixed-radix number where threadIdx.x is the least-significant
+ *  "digit" -- exactly like the units digit changes on every count while the
+ *  tens digit only changes every ten counts. A warp is just 32 consecutive
+ *  threads in this linear_id order, so within a warp threadIdx.x cycles
+ *  through its whole range before threadIdx.y ever increments. The
+ *  programmer's job is simply to line up the contiguous (stride-1) dimension
+ *  of their data with threadIdx.x, which is exactly what add_v2 does below.
  *    - add_v1 ties i to threadIdx.x -> consecutive threads jump by M in
  *      memory -> STRIDED / uncoalesced accesses (slow: one memory
  *      transaction per thread instead of one per warp).
@@ -56,7 +71,7 @@
 #define IDX(row, col, M) ((row) * (M) + (col))
 
 // computes c(i,j) = a(i,j) + b(i,j)
-// In this case i is the fastest changing thread dimension
+// In this case i is the fastest changing thread dimension (because is linked to threadIdx.x)
 //
 // Within a warp, threadIdx.x is what actually varies fastest across the 32
 // consecutive threads (threadIdx.y stays fixed for many of them). Here i is
@@ -81,7 +96,7 @@ __global__ void add_v1(int *a, int *b, int *c, int N, int M)
 }
 
 // computes c(i,j) = a(i,j) + b(i,j)
-// In this case j is the fastest changing thread dimension
+// In this case j is the fastest changing thread dimension (because is linked to threadIdx.x)
 //
 // Here j (the column, the contiguous dimension per IDX above) is derived
 // from threadIdx.x instead. Consecutive threads in a warp now get
