@@ -42,6 +42,6 @@
     "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#l2-cache",
     "../../examples/ch06/async_overlap/README.md",
     "../../examples/ch06/l2_cache/README.md",
-    "../../examples/ch06/bandwidth_bottleneck/README.md"
+    "../../examples/ch06/array_add_on_device/README.md"
   ]
 }
