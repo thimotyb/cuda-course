@@ -76,17 +76,30 @@ Eseguire lo stesso problema con configurazioni diverse:
 ./reduction 67108864 1024 20
 ```
 
-Osservare:
+Da questi run (solo il binario, senza profiler) si osservano le metriche che il
+programma stampa da solo, come mostrato in "Output atteso" al punto 3:
 
 - numero di blocchi lanciati;
 - shared memory per blocco;
-- tempo kernel medio;
-- theoretical occupancy;
-- achieved occupancy;
-- active warps;
-- eligible warps;
-- stall reasons;
-- memory throughput.
+- tempo kernel medio.
+
+Le altre metriche di occupancy -- theoretical occupancy, achieved occupancy,
+active warps, eligible warps, stall reasons, memory throughput -- **non
+compaiono in questo output**: il programma non le calcola. Sono metriche del
+profiler, visibili solo passando per Nsight Compute (sezione 6), ripetuto per
+ogni block size:
+
+```bash
+ncu --set full --force-overwrite -o reduction-ncu-bs64   ./reduction 67108864 64   20
+ncu --set full --force-overwrite -o reduction-ncu-bs128  ./reduction 67108864 128  20
+ncu --set full --force-overwrite -o reduction-ncu-bs256  ./reduction 67108864 256  20
+ncu --set full --force-overwrite -o reduction-ncu-bs512  ./reduction 67108864 512  20
+ncu --set full --force-overwrite -o reduction-ncu-bs1024 ./reduction 67108864 1024 20
+```
+
+Aprire ciascun report con `ncu-ui reduction-ncu-bsNNN.ncu-rep` (o leggere
+l'output testuale che `ncu` stampa comunque a schermo, anche senza GUI) e
+confrontare le sezioni elencate al punto 7 tra le varie configurazioni.
 
 ## 5. Profilare con Nsight Systems
 
@@ -148,7 +161,59 @@ Se il report e' troppo lento, ridurre `N` o `iterations` durante il profiling:
 ncu --set full --force-overwrite -o reduction-ncu ./reduction 16777216 256 5
 ```
 
-## 7. Sezioni Nsight Compute da leggere
+## 7. Leggere il report Nsight Compute da console (senza GUI)
+
+Non serve `ncu-ui`: `ncu` stampa lo stesso identico contenuto -- Launch
+Statistics, Occupancy, Warp State Statistics, Scheduler Statistics, Memory
+Workload Analysis, GPU Speed Of Light Throughput, Source Counters -- anche
+come testo in terminale. Utile su una macchina remota via SSH senza GUI.
+
+### Stampare direttamente durante il profiling
+
+Basta omettere `-o`:
+
+```bash
+ncu --set full ./reduction 16777216 256 5
+```
+
+Attenzione pero': senza restrizioni, `ncu` profila **ogni** lancio del
+kernel che incontra, quindi qui produrrebbe un report completo per il
+warmup piu' uno per ciascuna delle `iterations` chiamate nel ciclo timed --
+tanto testo ripetuto da scorrere. Per un singolo report pulito, saltare il
+warmup e limitarsi a un solo lancio con `--launch-skip` / `--launch-count`
+(e opzionalmente `--kernel-name` per essere espliciti su quale kernel):
+
+```bash
+ncu --set full --kernel-name reduceBlocksKernel \
+    --launch-skip 1 --launch-count 1 \
+    ./reduction 16777216 256 20
+```
+
+(`--launch-skip 1` salta il lancio di warmup, `--launch-count 1` profila
+esattamente un lancio del ciclo timed successivo.)
+
+### Rileggere un report gia' salvato
+
+Se il report e' gia' stato generato con `-o` (sezione 6), lo si puo'
+ristampare in console in qualsiasi momento, senza rilanciare il programma:
+
+```bash
+ncu --import reduction-ncu.ncu-rep
+```
+
+### Altri flag utili per l'output testuale
+
+- `--page details` (default): report completo per sezione, stesso contenuto
+  della pagina Details della GUI.
+- `--page raw`: valori grezzi delle metriche, una riga per metrica -- comodo
+  per fare `grep` su una metrica specifica.
+- `--csv` (insieme a `--page raw` o `--page details`): output CSV invece che
+  testo formattato, utile per script o confronti tra piu' run.
+- `--print-summary per-kernel`: una riga di riepilogo per kernel invece del
+  report completo -- comodo per confrontare rapidamente le 5 configurazioni
+  di block size (sezione 4) senza scorrere pagine di testo per ciascuna.
+
+## 8. Sezioni Nsight Compute da leggere
 
 Partire da:
 
@@ -169,10 +234,10 @@ Domande guida:
 - Il kernel e' piu' limitato da memoria, scheduling, sincronizzazione o istruzioni?
 - Cambiare block size migliora davvero il tempo medio?
 
-## 8. Pulizia
+## 9. Pulizia
 
 Per rimuovere file generati localmente:
 
 ```bash
-rm -f reduction reduction-nsys.nsys-rep reduction-nsys.sqlite reduction-ncu.ncu-rep
+rm -f reduction reduction-nsys.nsys-rep reduction-nsys.sqlite reduction-ncu.ncu-rep reduction-ncu-bs*.ncu-rep
 ```
